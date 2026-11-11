@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Passa</title>
+<meta name="description" content="Passa hjälper familjer och hundägare att hitta en passare nära sig, boka och betala med Swish.">
+<style>
+/* Layout: grön hero med två telefoner, sedan omväxlande sektioner på krämvit botten. Innehåll max 1120px, telefonskärmar från den riktiga appen bär berättelsen */
+:root{
+  --bg:#fbf7ee; --surface:#fffdf8; --ink:#173a3b; --muted:#566f6d; --line:#e9e0cd; --soft:#e2ebe6;
+  --green:#173a3b; --orange:#fd795b; --on-orange:#173a3b; --note-bg:#ffe9dc; --note-ink:#7a3418; --ok:#2c7a54;
+  --band:#173a3b; --band-ink:#fbf7ee; --band-muted:#b9cdc8; --bezel:#0b1d1e;
+  --font-display:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --font-body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,Menlo,Consolas,monospace;
+  --shadow:0 1px 2px rgba(23,58,59,.06),0 12px 32px rgba(23,58,59,.08);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f2627; --surface:#163536; --ink:#fbf7ee; --muted:#a9c0bb; --line:#28504f; --soft:#1f4546;
+  --green:#cfe6df; --note-bg:#4a2a1f; --note-ink:#ffd2c2; --ok:#7fd3a7;
+  --band:#0b1d1e; --band-ink:#fbf7ee; --band-muted:#a9c0bb; --bezel:#050f10;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f2627; --surface:#163536; --ink:#fbf7ee; --muted:#a9c0bb; --line:#28504f; --soft:#1f4546;
+  --green:#cfe6df; --note-bg:#4a2a1f; --note-ink:#ffd2c2; --ok:#7fd3a7;
+  --band:#0b1d1e; --band-ink:#fbf7ee; --band-muted:#a9c0bb; --bezel:#050f10;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.35); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.55}
+h1,h2,h3{font-family:var(--font-display);margin:0;line-height:1.1;text-wrap:balance;letter-spacing:-.01em}
+h2{font-size:clamp(1.9rem,4.4vw,2.9rem)}
+h3{font-size:1.3rem}
+p{margin:0}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--orange);outline-offset:3px;border-radius:6px}
+section[id]{scroll-margin-top:84px}
+
+.in{max-width:1120px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.eyebrow{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;font-weight:750;color:var(--orange)}
+.lead{font-size:1.15rem;color:var(--muted);max-width:52ch}
+.muted{color:var(--muted)}
+.small{font-size:.9rem}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:12px 22px;border-radius:14px;font-weight:700;text-decoration:none;font-size:1rem;border:0;cursor:pointer;transition:transform .12s,box-shadow .2s}
+.btn:active{transform:scale(.98)}
+.btn.orange{background:var(--orange);color:var(--on-orange)}
+.btn.orange:hover{box-shadow:0 8px 20px rgba(253,121,91,.35)}
+.btn.line{border:1.5px solid currentColor;color:inherit;background:transparent}
+.btn.green{background:var(--ink);color:var(--bg)}
+.btn svg{width:18px;height:18px}
+
+/* Sidhuvud */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--band)}
+.site-head{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--band);color:var(--band-ink);border-bottom:1px solid rgba(255,255,255,.08)}
+.site-head .in{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:68px}
+.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--font-display);font-weight:700;font-size:1.7rem;color:var(--band-ink)}
+.logo i{width:28px;height:28px;border-radius:9px 9px 9px 2px;background:var(--orange)}
+.logo b{font-weight:700}.logo b span{color:var(--orange)}
+.site-nav{display:flex;align-items:center;gap:4px}
+.site-nav a.l{color:var(--band-muted);text-decoration:none;font-weight:600;font-size:.95rem;padding:8px 12px;border-radius:10px}
+.site-nav a.l:hover{color:var(--band-ink);background:rgba(255,255,255,.08)}
+.site-nav .btn{min-height:42px;padding:8px 16px;margin-left:8px}
+@media (max-width:900px){.site-nav a.l{display:none}}
+
+/* Hero */
+.hero{background:var(--band);color:var(--band-ink);overflow:hidden}
+.hero .in{display:grid;gap:40px;align-items:center;padding-block:48px 0}
+@media (min-width:900px){.hero .in{grid-template-columns:1.05fr .95fr;padding-block:72px 0;gap:24px}}
+.hero h1{font-size:clamp(2.6rem,7vw,4.6rem);color:var(--band-ink)}
+.hero h1 em{color:var(--orange)}
+.hero .lead{color:var(--band-muted);margin-top:20px}
+.hero .ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+.hero .copy{padding-bottom:40px}
+@media (min-width:900px){.hero .copy{padding-bottom:88px}}
+.status-pill{display:inline-flex;align-items:center;gap:8px;font-size:.85rem;font-weight:650;color:var(--band-ink);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);padding:6px 12px;border-radius:99px;margin-bottom:22px}
+.status-pill::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--orange)}
+.hero-phones{position:relative;display:flex;justify-content:center;align-items:flex-end;min-height:420px}
+.hero-phones .phone{margin-bottom:-90px}
+.hero-phones .phone.back{position:absolute;left:50%;transform:translateX(-112%) rotate(-6deg) scale(.86);transform-origin:bottom center;opacity:.95}
+.hero-phones .phone.front{transform:translateX(18%) rotate(3deg)}
+@media (max-width:640px){.hero-phones .phone.back{display:none}.hero-phones .phone.front{transform:none}}
+
+/* Telefonram */
+.phone{width:min(280px,72vw);aspect-ratio:585/1266;border-radius:42px;background:var(--bezel);padding:10px;box-shadow:0 30px 60px rgba(0,0,0,.35),inset 0 0 0 1.5px rgba(255,255,255,.12);position:relative;flex:none;max-width:100%}
+.phone img{display:block;width:100%;height:100%;object-fit:cover;object-position:top;border-radius:33px;background:#fbf7ee}
+.phone.sm{width:min(230px,62vw);border-radius:36px;padding:8px}
+.phone.sm img{border-radius:29px}
+
+/* Sektioner */
+.sec{padding-block:88px 0}
+.sec-head{display:flex;flex-direction:column;gap:14px;margin-bottom:40px;max-width:720px}
+.first{padding-top:140px}
+
+.duo{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.duo article{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:14px}
+.duo .tag{align-self:flex-start;font-size:.8rem;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--soft);color:var(--green)}
+.duo ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.duo li{display:flex;gap:10px;align-items:flex-start}
+.duo li svg{width:20px;height:20px;color:var(--orange);flex:none;margin-top:3px}
+.duo .from{margin-top:auto;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+
+.steps{display:grid;gap:40px 24px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.step{display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center}
+.step .stage{width:100%;background:var(--soft);border-radius:28px;padding:32px 16px 0;display:flex;justify-content:center;overflow:hidden;height:400px}
+.step .num{font-family:var(--font-display);font-size:1rem;font-weight:700;width:40px;height:40px;border-radius:50%;background:var(--orange);color:var(--on-orange);display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.step p{max-width:34ch}
+
+/* Betalning */
+.pay{display:grid;gap:40px;align-items:center}
+@media (min-width:900px){.pay{grid-template-columns:1fr 1fr;gap:64px}}
+.pay-copy{display:flex;flex-direction:column;gap:22px}
+.track{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:6px;position:relative}
+.track li{list-style:none;display:flex;flex-direction:column;gap:8px;position:relative;padding-right:10px}
+.track li::before{content:"";position:absolute;top:13px;left:26px;right:0;height:2px;background:var(--line)}
+.track li:last-child::before{display:none}
+.track .dot{width:28px;height:28px;border-radius:50%;border:2px solid currentColor;display:grid;place-items:center;background:var(--bg);position:relative;z-index:1}
+.track .dot svg{width:14px;height:14px}
+.track li:nth-child(1){color:var(--orange)} .track li:nth-child(2){color:var(--green)} .track li:nth-child(3){color:var(--ok)}
+.track b{color:var(--ink);font-size:.95rem}
+.track span{color:var(--muted);font-size:.85rem;line-height:1.4}
+.calc{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
+.calc .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-variant-numeric:tabular-nums}
+.calc .sum{font-family:var(--font-display);font-size:2.2rem;font-weight:700}
+.calc code{font-family:var(--mono);font-weight:700;background:var(--bg);border:1px solid var(--line);padding:3px 8px;border-radius:8px;font-size:.95rem}
+.calc hr{border:0;border-top:1px dashed var(--line);margin:4px 0;width:100%}
+.methods{display:flex;gap:12px;flex-wrap:wrap}
+.method{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:14px;padding:10px 14px;background:var(--surface)}
+.method b{display:block;font-size:.98rem}
+.method span{font-size:.82rem;color:var(--muted)}
+.method .sw{width:30px;height:30px;border-radius:9px;background:var(--orange);display:grid;place-items:center;color:var(--on-orange)}
+.method .sw svg{width:18px;height:18px}
+.method.soon{opacity:.7;border-style:dashed}
+.method.soon .sw{background:var(--soft);color:var(--green)}
+
+/* Passare */
+.sitters{background:var(--band);color:var(--band-ink);border-radius:32px;overflow:hidden;display:grid;gap:24px;align-items:end}
+@media (min-width:900px){.sitters{grid-template-columns:1.2fr .8fr}}
+.sitters .copy{padding:40px 28px 8px;display:flex;flex-direction:column;gap:20px}
+@media (min-width:900px){.sitters .copy{padding:56px 56px 56px}}
+.sitters h2{color:var(--band-ink)}
+.sitters .lead{color:var(--band-muted)}
+.sitters ol{margin:0;padding:0;list-style:none;display:grid;gap:14px;counter-reset:s}
+.sitters ol li{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start;counter-increment:s}
+.sitters ol li::before{content:counter(s);width:30px;height:30px;border-radius:50%;border:1.5px solid var(--orange);color:var(--orange);display:grid;place-items:center;font-weight:700;font-size:.9rem;font-variant-numeric:tabular-nums}
+.sitters ol b{display:block}
+.sitters ol span{color:var(--band-muted);font-size:.93rem}
+.sitters .art{display:flex;justify-content:center;padding:0 20px}
+.sitters .art .phone{margin-bottom:-120px}
+@media (min-width:900px){.sitters .art .phone{margin-bottom:-60px}}
+.sitters .art{padding-bottom:120px;overflow:hidden;max-height:560px}
+@media (max-width:899px){.sitters .art{max-height:380px;padding-bottom:0}}
+
+/* Trygghet */
+.trust{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.trust > div{border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:14px}
+.trust .now{background:var(--surface);border:1px solid var(--line)}
+.trust .plan{border:1.5px dashed var(--line)}
+.trust .tips{background:var(--soft)}
+.trust ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.trust li{display:flex;gap:10px;align-items:flex-start}
+.trust li svg{width:20px;height:20px;flex:none;margin-top:3px}
+.trust .now li svg{color:var(--ok)}
+.trust .plan li svg{color:var(--muted)}
+.trust .tips li svg{color:var(--orange)}
+.label{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;font-weight:750;color:var(--muted)}
+
+/* Frågor */
+.faq{display:grid;gap:40px}
+@media (min-width:900px){.faq{grid-template-columns:.8fr 1.2fr;gap:64px}}
+.faq-list{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+details{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;list-style:none;padding:20px 40px 20px 0;font-weight:700;font-size:1.06rem;position:relative}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"";position:absolute;right:6px;top:50%;width:12px;height:12px;border-right:2px solid var(--orange);border-bottom:2px solid var(--orange);transform:translateY(-70%) rotate(45deg);transition:transform .2s}
+details[open] summary::after{transform:translateY(-30%) rotate(-135deg)}
+details p{padding:0 0 22px;color:var(--muted);max-width:62ch}
+
+/* Avslut */
+.final{margin-top:96px;background:var(--orange);color:var(--on-orange)}
+.final .in{padding-block:64px;display:flex;justify-content:space-between;align-items:center;gap:28px;flex-wrap:wrap}
+.final h2{color:#173a3b;max-width:18ch}
+.final p{color:#173a3b;opacity:.85;margin-top:10px;max-width:46ch}
+.final .btn.green{background:#173a3b;color:#fbf7ee}
+.final .btn.line{color:#173a3b}
+.foot{background:var(--band);color:var(--band-muted);font-size:.9rem}
+.foot .in{padding-block:36px calc(36px + env(safe-area-inset-bottom,0px));display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.foot nav{display:flex;gap:18px;flex-wrap:wrap}
+.foot a{color:var(--band-ink);text-decoration:none}
+.foot a:hover{text-decoration:underline}
+.foot .logo{font-size:1.4rem}
+.foot .logo i{width:22px;height:22px}
+.foot .stack{display:flex;flex-direction:column;gap:10px;max-width:44ch}
+
+@media (prefers-reduced-motion:no-preference){
+  .hero-phones .phone{animation:rise .9s cubic-bezier(.2,.8,.2,1) both}
+  .hero-phones .phone.back{animation-delay:.12s}
+  @keyframes rise{from{translate:0 40px}to{translate:0 0}}
+}
+</style>
+</head>
+<body>
+<header class="site-head"><div class="in">
+  <a class="logo" href="#top" aria-label="Passa, till toppen"><i aria-hidden="true"></i><b>Passa<span>.</span></b></a>
+  <nav class="site-nav" aria-label="Sidans delar">
+    <a class="l" href="#sa-fungerar-det">Så fungerar det</a>
+    <a class="l" href="#betalning">Betalning</a>
+    <a class="l" href="#bli-passare">Bli passare</a>
+    <a class="l" href="#trygghet">Trygghet</a>
+    <a class="l" href="#fragor">Frågor</a>
+    <a class="btn orange" href="app.html">Öppna appen</a>
+  </nav>
+</div></header>
+
+<main id="top">
+<section class="hero"><div class="in">
+  <div class="copy">
+    <span class="status-pill">Under utveckling · prova prototypen</span>
+    <h1>Någon att lita på, <em>nära dig.</em></h1>
+    <p class="lead">Passa hjälper familjer och hundägare att hitta en barnvakt eller hundvakt i sin ort. Ni chattar, bokar och betalar med Swish, allt på ett ställe.</p>
+    <div class="ctas">
+      <a class="btn orange" href="app.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Hitta en passare</a>
+      <a class="btn line" href="app.html#annons">Bli passare</a>
+    </div>
+  </div>
+  <div class="hero-phones" aria-hidden="true">
+    <div class="phone back"><img src="img/profile.webp" alt="" width="585" height="1266"></div>
+    <div class="phone front"><img src="img/results.webp" alt="" width="585" height="1266"></div>
+  </div>
+</div></section>
+
+<section class="in first" aria-labelledby="h-help">
+  <div class="sec-head"><span class="eyebrow">Två sorters hjälp</span><h2 id="h-help">För barnen och för hunden</h2>
+    <p class="lead">Varje passare visar vad de tar, var de bor och vad de tar betalt per timme. Du ser avståndet från din ort direkt.</p></div>
+  <div class="duo">
+    <article><span class="tag">Barnvakt</span><h3>När du behöver en kväll, en hämtning eller en hel lördag</h3>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Kvällar och helger</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Hämtning från förskola och skola</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Skriv om allergier, rutiner och läggtider i förfrågan</li>
+      </ul>
+      <div class="from"><span class="muted small">Passaren sätter sitt eget timpris</span><a class="btn green" href="app.html">Sök barnvakt</a></div></article>
+    <article><span class="tag">Hundvakt</span><h3>När hunden behöver en promenad, sällskap eller en plats över dagen</h3>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Promenader och rastning</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Hunddagis hemma hos passaren</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Skriv ras, ålder och vanor i förfrågan</li>
+      </ul>
+      <div class="from"><span class="muted small">Passaren sätter sitt eget timpris</span><a class="btn green" href="app.html">Sök hundvakt</a></div></article>
+  </div>
+</section>
+
+<section class="in sec" id="sa-fungerar-det" aria-labelledby="h-how">
+  <div class="sec-head"><span class="eyebrow">Så fungerar det</span><h2 id="h-how">Från sökning till betalt pass i tre steg</h2></div>
+  <div class="steps">
+    <div class="step"><div class="stage"><div class="phone sm"><img src="img/results.webp" alt="Sökresultat i appen med passare nära Umeå, pris per timme och avstånd" width="585" height="1266" loading="lazy"></div></div>
+      <span class="num">1</span><h3>Sök och jämför</h3><p class="muted">Välj barn eller hund, din ort och hur långt bort passaren får bo. Sortera på avstånd, pris eller betyg.</p></div>
+    <div class="step"><div class="stage"><div class="phone sm"><img src="img/chat.webp" alt="Chatt i appen där en förälder frågar en passare om fredag kväll" width="585" height="1266" loading="lazy"></div></div>
+      <span class="num">2</span><h3>Chatta och boka</h3><p class="muted">Ställ dina frågor först. Skicka sedan en förfrågan med datum, tid och antal timmar och se vad det kostar.</p></div>
+    <div class="step"><div class="stage"><div class="phone sm"><img src="img/pay.webp" alt="Swish-betalning i appen med belopp och meddelande att kopiera" width="585" height="1266" loading="lazy"></div></div>
+      <span class="num">3</span><h3>Betala med Swish</h3><p class="muted">Efter passet swishar du passaren direkt. Belopp och meddelande står färdiga att kopiera.</p></div>
+  </div>
+</section>
+
+<section class="in sec" id="betalning" aria-labelledby="h-pay">
+  <div class="pay">
+    <div class="pay-copy">
+      <span class="eyebrow">Betalning</span><h2 id="h-pay">Pengarna går direkt till passaren</h2>
+      <p class="lead">Du betalar först när passet är klart. Appen räknar ut beloppet och ger varje bokning ett eget meddelande, så att passaren ser vilken betalning som hör till vilket pass.</p>
+      <ol class="track" aria-label="Betalningens steg">
+        <li><span class="dot"></span><b>Ej betald</b><span>Passet är bokat eller klart</span></li>
+        <li><span class="dot"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg></span><b>Swishad</b><span>Du har betalat och markerat det</span></li>
+        <li><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><b>Bekräftad</b><span>Passaren har fått pengarna</span></li>
+      </ol>
+      <div class="methods">
+        <div class="method"><span class="sw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg></span><div><b>Swish</b><span>Finns i appen nu</span></div></div>
+        <div class="method soon"><span class="sw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg></span><div><b>Klarna</b><span>Faktura och delbetalning, planerat</span></div></div>
+      </div>
+    </div>
+    <div class="calc" aria-label="Räkneexempel">
+      <span class="label">Räkneexempel</span>
+      <div class="row"><span>Barnpassning fredag kväll</span><span>3 h</span></div>
+      <div class="row"><span>Timpris</span><span>160 kr</span></div>
+      <hr>
+      <div class="row"><span class="muted">Att swisha</span><span class="sum">480 kr</span></div>
+      <div class="row small"><span class="muted">Meddelande i Swish</span><code>PASSA AB12CD3</code></div>
+      <p class="muted small">Passa tar inte emot eller håller några pengar. Betalningen går från din Swish till passarens.</p>
+    </div>
+  </div>
+</section>
+
+<section class="in sec" id="bli-passare" aria-labelledby="h-sit">
+  <div class="sitters">
+    <div class="copy">
+      <span class="eyebrow">Bli passare</span><h2 id="h-sit">Tjäna pengar på något du redan är bra på</h2>
+      <p class="lead">Gillar du barn eller hundar? Skapa en annons, sätt ditt eget pris och få betalt med Swish efter varje pass.</p>
+      <ol>
+        <li><div><b>Skapa din annons</b><span>Namn, ort, bild och några rader om dig. Det tar ett par minuter.</span></div></li>
+        <li><div><b>Sätt pris och lägg in Swish-nummer</b><span>Du bestämmer timpriset. Numret visas för kunden när det är dags att betala.</span></div></li>
+        <li><div><b>Svara på förfrågningar</b><span>Chatta med familjen, gör passet och bekräfta betalningen i appen.</span></div></li>
+      </ol>
+      <div><a class="btn orange" href="app.html#annons">Skapa annons</a></div>
+    </div>
+    <div class="art" aria-hidden="true"><div class="phone"><img src="img/book.webp" alt="" width="585" height="1266"></div></div>
+  </div>
+</section>
+
+<section class="in sec" id="trygghet" aria-labelledby="h-trust">
+  <div class="sec-head"><span class="eyebrow">Trygghet</span><h2 id="h-trust">Vad som gäller i dag, och vad som kommer</h2>
+    <p class="lead">Vi säger hellre exakt vad tjänsten gör än lovar för mycket. Passa är under utveckling och vissa skydd finns inte än.</p></div>
+  <div class="trust">
+    <div class="now"><span class="label">Gäller nu</span><h3>Inbyggt i appen</h3><ul>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Omdömen kan bara lämnas efter ett genomfört pass</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Chatta innan du skickar en bokning</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Priset och kostnaden syns innan du bokar</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Passa hanterar inga pengar</li></ul></div>
+    <div class="plan"><span class="label">Planerat inför lansering</span><h3>Det vi bygger härnäst</h3><ul>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/></svg>Inloggning och identifiering med BankID</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/></svg>Utdrag ur belastningsregistret för barnpassare</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/></svg>Konton som delas mellan alla användare</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/></svg>Betalning med Klarna</li></ul></div>
+    <div class="tips"><span class="label">Våra tips</span><h3>Innan första passet</h3><ul>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Träffas en kort stund innan, gärna med barnet eller hunden</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Be om referenser från tidigare familjer eller hundägare</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Gå igenom rutiner, allergier och vem som ska ringas vid nödfall</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Börja med ett kort pass</li></ul></div>
+  </div>
+</section>
+
+<section class="in sec" id="fragor" aria-labelledby="h-faq">
+  <div class="faq">
+    <div class="sec-head" style="margin:0"><span class="eyebrow">Frågor och svar</span><h2 id="h-faq">Bra att veta</h2>
+      <p class="lead">Hittar du inte svaret? Prova appen, den visar hur allt fungerar.</p></div>
+    <div class="faq-list">
+      <details><summary>Vad kostar en passare?</summary><p>Varje passare sätter sitt eget timpris, och det syns på profilen. När du skickar en förfrågan räknar appen ut den totala kostnaden utifrån antal timmar.</p></details>
+      <details><summary>Hur betalar jag?</summary><p>Med Swish, efter passet. Under Mina bokningar trycker du på Betala med Swish. Där står passarens nummer, beloppet och ett meddelande som du kopierar in i Swish-appen.</p></details>
+      <details><summary>Kan jag betala med Klarna?</summary><p>Inte än. Klarna kräver ett avtal mellan Passa och Klarna, och det är planerat inför lanseringen.</p></details>
+      <details><summary>Är passarna kontrollerade?</summary><p>Inte än. Identifiering med BankID och utdrag ur belastningsregistret är planerat. Tills dess rekommenderar vi att du träffar passaren först och ber om referenser.</p></details>
+      <details><summary>Hur fungerar omdömen?</summary><p>När ett pass är markerat som genomfört kan du ge passaren ett betyg från 1 till 5 och skriva en kommentar. Passarens snittbetyg räknas om direkt.</p></details>
+      <details><summary>Var finns Passa?</summary><p>Du kan söka i hela Sverige. Avståndet räknas från din ort, så du ser vilka passare som bor närmast.</p></details>
+      <details><summary>Vad händer med det jag skriver i prototypen?</summary><p>Det sparas bara i din egen webbläsare. Ingen annan ser dina bokningar, meddelanden eller annonser, och du kan radera allt under Profil.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="final"><div class="in">
+  <div><h2>Hitta en passare i dag</h2><p>Prova appen, sök i din ort och se hur bokning och Swish-betalning fungerar.</p></div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn green" href="app.html">Öppna appen</a><a class="btn line" href="app.html#annons">Bli passare</a></div>
+</div></section>
+</main>
+
+<footer class="foot"><div class="in">
+  <div class="stack"><a class="logo" href="#top"><i aria-hidden="true"></i><b>Passa<span>.</span></b></a>
+    <p>Barn- och hundpassning nära dig. Passa är under utveckling, och prototypen hanterar inga riktiga konton eller betalningar.</p></div>
+  <nav aria-label="Sidfot">
+    <a href="#sa-fungerar-det">Så fungerar det</a><a href="#betalning">Betalning</a><a href="#bli-passare">Bli passare</a><a href="#trygghet">Trygghet</a><a href="#fragor">Frågor</a><a href="app.html">Appen</a>
+  </nav>
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Passa</title>
+<style>
+/* Layout: mobilförst. Grön hero-band på startsidan, innehåll upp till 1080px, formulär 680px. Flikrad i botten på mobil, i sidhuvudet på dator */
+:root{
+  --bg:#fbf7ee; --surface:#fffdf8; --ink:#173a3b; --muted:#566f6d; --line:#e9e0cd;
+  --teal:#173a3b; --teal-soft:#e2ebe6; --coral:#fd795b; --coral-ink:#173a3b; --warn-bg:#ffe9dc; --warn-ink:#7a3418;
+  --ok:#2c7a54;
+  --font-display:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --font-body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:16px;
+  --hero-bg:#173a3b; --hero-ink:#fbf7ee; --hero-muted:#b9cdc8; --accent:#fd795b;
+  --shadow:0 1px 2px rgba(23,58,59,.06),0 8px 24px rgba(23,58,59,.07);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f2627; --surface:#173a3b; --ink:#fbf7ee; --muted:#a9c0bb; --line:#28504f;
+  --teal:#cfe6df; --teal-soft:#21494a; --coral:#fd795b; --coral-ink:#173a3b; --warn-bg:#4a2a1f; --warn-ink:#ffd2c2; --ok:#7fd3a7; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f2627; --surface:#173a3b; --ink:#fbf7ee; --muted:#a9c0bb; --line:#28504f;
+  --teal:#cfe6df; --teal-soft:#21494a; --coral:#fd795b; --coral-ink:#173a3b; --warn-bg:#4a2a1f; --warn-ink:#ffd2c2; --ok:#7fd3a7; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(1.9rem,6vw,2.6rem)} h2{font-size:1.45rem} h3{font-size:1.1rem}
+p{margin:0}
+a{color:var(--teal)}
+main{padding-bottom:84px}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 40px}
+.wrap.narrow{max-width:680px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.topin{max-width:1080px;min-height:60px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px}
+.logo{font-family:var(--font-display);font-size:1.6rem;font-weight:700;color:var(--teal);text-decoration:none;letter-spacing:-.01em;display:inline-flex;align-items:center;gap:8px}
+.logo i{width:26px;height:26px;border-radius:8px 8px 8px 2px;background:var(--accent);display:inline-block}
+.logo span{color:var(--coral)}
+.demo-pill{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;background:var(--warn-bg);color:var(--warn-ink);padding:4px 10px;border-radius:99px;font-weight:600}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+nav.tabs a{flex:1;max-width:144px;text-align:center;padding:10px 4px 12px;text-decoration:none;color:var(--muted);font-size:.78rem;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav.tabs a svg{width:22px;height:22px}
+nav.tabs a[aria-current="page"]{color:var(--teal)}
+.badge{background:var(--coral);color:var(--coral-ink);border-radius:99px;font-size:.68rem;padding:0 6px;margin-left:2px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.btn{appearance:none;border:0;border-radius:12px;padding:12px 18px;font:inherit;font-weight:650;cursor:pointer;background:var(--teal);color:var(--bg);text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px}
+.btn.coral{background:var(--coral);color:var(--coral-ink)}
+.btn.ghost{background:transparent;color:var(--teal);border:1.5px solid var(--line)}
+.btn.small{min-height:36px;padding:6px 12px;font-size:.88rem}
+.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+label{font-weight:600;font-size:.9rem;display:flex;flex-direction:column;gap:6px}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;min-height:46px;width:100%}
+textarea{min-height:90px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:460px){.grid2{grid-template-columns:1fr}}
+.hero{padding-block:16px 4px}
+.hero p{font-size:1.08rem;max-width:34ch;margin-top:10px;color:var(--muted)}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choice button{appearance:none;font:inherit;text-align:left;cursor:pointer;border-radius:var(--r);border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:18px 16px;display:flex;flex-direction:column;gap:6px}
+.choice button[aria-pressed="true"]{border-color:var(--teal);background:var(--teal-soft)}
+.choice b{font-family:var(--font-display);font-size:1.25rem}
+.seg{display:inline-flex;align-self:flex-start;border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+.seg button{appearance:none;border:0;background:transparent;color:var(--ink);font:inherit;font-weight:600;padding:8px 14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--teal);color:var(--bg)}
+.sitter{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:start}
+.sitter > div{min-width:0}
+@media (max-width:460px){.sitter{grid-template-columns:56px 1fr}.sitter .price{grid-column:2}}
+.avatar{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:1.4rem;color:var(--bg);background:var(--teal);overflow:hidden;flex:none}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.avatar.lg{width:96px;height:96px;font-size:2rem}
+.price{font-variant-numeric:tabular-nums;font-weight:700;text-align:right;white-space:nowrap}
+.price small{display:block;font-weight:500;color:var(--muted);font-size:.8rem}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:.76rem;font-weight:650;padding:3px 9px;border-radius:99px;background:var(--teal-soft);color:var(--teal)}
+.chip.ex{background:var(--warn-bg);color:var(--warn-ink)}
+.chip.ok{background:transparent;border:1px solid var(--ok);color:var(--ok)}
+.stars{color:var(--coral);letter-spacing:1px}
+.note{background:var(--warn-bg);color:var(--warn-ink);border-radius:12px;padding:12px 14px;font-size:.9rem}
+.empty{text-align:center;padding:28px 16px;color:var(--muted)}
+.chat{display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow-y:auto;padding:4px}
+.msg{max-width:80%;padding:9px 13px;border-radius:16px;background:var(--teal-soft);overflow-wrap:anywhere}
+.msg.me{align-self:flex-end;background:var(--teal);color:var(--bg)}
+.msg time{display:block;font-size:.7rem;opacity:.7;margin-top:2px}
+.list-btn{appearance:none;font:inherit;color:inherit;text-align:left;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;cursor:pointer;display:flex;gap:12px;align-items:center}
+.list-btn > div{min-width:0}
+.list-btn .avatar{width:44px;height:44px;font-size:1rem}
+.trunc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status{font-size:.76rem;font-weight:700;padding:3px 9px;border-radius:99px;border:1px solid currentColor}
+.status.req{color:var(--coral)} .status.done{color:var(--ok)} .status.cancel{color:var(--muted)}
+.rate{display:flex;gap:4px}
+.rate button{appearance:none;background:none;border:0;font-size:1.8rem;cursor:pointer;color:var(--line);padding:0 2px}
+.rate button.on{color:var(--coral)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;z-index:20;max-width:calc(100% - 32px)}
+.paybox{border:1.5px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--bg)}
+.payopt{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;font-weight:500}
+.payopt input{width:20px;min-height:20px;margin-top:3px;flex:none}
+.payopt:has(input:checked){border-color:var(--teal);background:var(--teal-soft)}
+.payopt.off{opacity:.6;cursor:not-allowed}
+.payopt b{display:block}
+.copyrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:10px;background:var(--surface);border:1px solid var(--line)}
+.copyrow > div{min-width:0}
+.copyrow code{font:600 1.1rem/1.2 ui-monospace,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;user-select:all;overflow-wrap:anywhere}
+.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.status.paid{color:var(--teal)}
+.band{background:var(--hero-bg);color:var(--hero-ink)}
+.band .inner{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 48px;display:grid;gap:28px;align-items:center}
+@media (min-width:900px){.band .inner{grid-template-columns:1.1fr .9fr;padding-block:64px 72px;gap:48px}}
+.band h1{font-size:clamp(2.1rem,5.5vw,3.4rem);color:var(--hero-ink);letter-spacing:-.015em}
+.band h1 em{font-style:italic;color:var(--accent)}
+.band .lead{font-size:1.12rem;color:var(--hero-muted);max-width:40ch;margin-top:16px}
+.eyebrow{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--accent);margin-bottom:14px}
+.checks{list-style:none;padding:0;margin:24px 0 0;display:flex;flex-direction:column;gap:10px;color:var(--hero-ink)}
+.checks li{display:flex;gap:10px;align-items:center}
+.checks svg{width:20px;height:20px;color:var(--accent);flex:none}
+.searchcard{background:var(--surface);color:var(--ink);border-radius:20px;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:14px}
+.searchcard h2{font-size:1.3rem}
+.section{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:48px 8px}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.section-head h2{font-size:clamp(1.5rem,3.5vw,2rem)}
+.steps3{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.step{display:flex;flex-direction:column;gap:8px}
+.step .num{width:38px;height:38px;border-radius:50%;background:var(--accent);color:#173a3b;font-weight:800;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+.scard{display:flex;flex-direction:column;gap:12px;transition:box-shadow .2s,transform .2s}
+.scard:hover{box-shadow:var(--shadow)}
+.scard-top{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.scard-top > div{min-width:0}
+.scard-top .avatar{width:56px;height:56px;font-size:1.2rem}
+.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.scard-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto;padding-top:12px;border-top:1px solid var(--line)}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px}
+.trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.trust .card{display:flex;flex-direction:column;gap:8px}
+.ico{width:42px;height:42px;border-radius:12px;background:var(--teal-soft);color:var(--teal);display:grid;place-items:center}
+.ico svg{width:22px;height:22px}
+.cta{margin-top:24px;border-radius:24px;background:var(--teal-soft);padding:28px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.cta h2{font-size:clamp(1.4rem,3vw,1.8rem)}
+footer.foot{margin-top:56px;border-top:1px solid var(--line)}
+footer.foot .inner{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:.86rem}
+.pgrid{display:grid;gap:20px;align-items:start}
+@media (min-width:900px){.pgrid{grid-template-columns:1fr 340px}.pgrid aside{position:sticky;top:calc(80px + env(safe-area-inset-top,0px))}}
+.phead{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.phead > div{min-width:0}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px}
+.facts dt{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;font-weight:650}
+.facts dd{margin:2px 0 0;font-weight:600}
+.bigprice{font-family:var(--font-display);font-size:2rem;font-weight:700;font-variant-numeric:tabular-nums}
+.paylist{display:flex;flex-direction:column;gap:8px;font-size:.9rem}
+.paylist div{display:flex;justify-content:space-between;gap:8px}
+hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+.back{appearance:none;background:none;border:0;color:var(--teal);font:inherit;font-weight:600;cursor:pointer;padding:0;align-self:flex-start}
+@media (min-width:800px){
+  nav.tabs{top:0;bottom:auto;left:auto;right:max(16px,calc(50% - 540px));border:0;background:transparent;height:61px;align-items:center;z-index:7;gap:2px}
+  main{padding-bottom:0}
+  nav.tabs a{flex-direction:row;padding:8px 12px;font-size:.9rem;border-radius:10px;max-width:none}
+  nav.tabs a:hover{background:var(--teal-soft);color:var(--teal)}
+  nav.tabs a[aria-current="page"]{background:var(--teal-soft)}
+  nav.tabs a svg{width:18px;height:18px}
+  .wrap{padding-block:32px 56px}
+  .topin .demo-pill{display:none}
+}
+@media (prefers-reduced-motion:no-preference){.btn,.choice button{transition:transform .12s, background .2s}.btn:active{transform:scale(.98)}}
+</style>
+</head>
+<body>
+<header class="top"><div class="topin"><a class="logo" href="#start"><i aria-hidden="true"></i><b style="font-weight:700">Passa<span>.</span></b></a><span class="demo-pill">Prototyp</span></div></header>
+<main id="app"></main>
+<nav class="tabs" id="tabs" aria-label="Huvudmeny"></nav>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Hjälpfunktioner ---------- */
+const $ = s => document.querySelector(s);
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = () => Math.random().toString(36).slice(2,9);
+const kr = n => new Intl.NumberFormat("sv-SE").format(Math.round(n)) + " kr";
+const today = () => new Date().toISOString().slice(0,10);
+const fmtDate = d => { try { return new Date(d+"T12:00").toLocaleDateString("sv-SE",{weekday:"short",day:"numeric",month:"short"}); } catch(e){ return d; } };
+const fmtTime = ts => new Date(ts).toLocaleString("sv-SE",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+function toast(t){ const el=$("#toast"); el.textContent=t; el.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>el.hidden=true,2400); }
+/* Swish: svenskt mobilnummer 07X XXX XX XX */
+const cleanSwish = v => { let d=String(v||"").replace(/\D/g,""); if(d.startsWith("46")) d="0"+d.slice(2); return d; };
+const validSwish = v => /^07[02369]\d{7}$/.test(cleanSwish(v));
+const fmtSwish = v => { const d=cleanSwish(v); return d.length===10? `${d.slice(0,3)}-${d.slice(3,6)} ${d.slice(6,8)} ${d.slice(8)}` : d; };
+const payRef = b => "PASSA " + b.id.toUpperCase();
+function copyText(text, btn){
+  const done=()=>{ const o=btn.textContent; btn.textContent="Kopierat"; setTimeout(()=>btn.textContent=o,1500); };
+  try { navigator.clipboard.writeText(text).then(done).catch(()=>selectNear(btn)); } catch(e){ selectNear(btn); }
+}
+function selectNear(btn){ const c=btn.parentElement.querySelector("code"); if(!c) return; const r=document.createRange(); r.selectNodeContents(c); const s=getSelection(); s.removeAllRanges(); s.addRange(r); toast("Markerat. Kopiera med Ctrl+C eller håll in."); }
+
+/* ---------- Orter och avstånd (Haversine) ---------- */
+const CITIES = {"Stockholm":[59.3293,18.0686],"Göteborg":[57.7089,11.9746],"Malmö":[55.6050,13.0038],"Uppsala":[59.8586,17.6389],"Västerås":[59.6099,16.5448],"Örebro":[59.2753,15.2134],"Linköping":[58.4108,15.6214],"Helsingborg":[56.0465,12.6945],"Jönköping":[57.7826,14.1618],"Norrköping":[58.5877,16.1924],"Lund":[55.7047,13.1910],"Umeå":[63.8258,20.2630],"Gävle":[60.6749,17.1413],"Borås":[57.7210,12.9401],"Sundsvall":[62.3908,17.3069],"Luleå":[65.5848,22.1547],"Östersund":[63.1792,14.6357],"Karlstad":[59.4022,13.5115],"Växjö":[56.8777,14.8091],"Skellefteå":[64.7507,20.9528],"Örnsköldsvik":[63.2909,18.7153],"Holmsund":[63.7059,20.3640]};
+function findCity(q){ q=(q||"").trim().toLowerCase(); if(!q) return null; return Object.keys(CITIES).find(c=>c.toLowerCase()===q) || Object.keys(CITIES).find(c=>c.toLowerCase().startsWith(q)) || null; }
+function km(a,b){ const R=6371,r=x=>x*Math.PI/180; const dLat=r(b[0]-a[0]), dLng=r(b[1]-a[1]); const h=Math.sin(dLat/2)**2+Math.cos(r(a[0]))*Math.cos(r(b[0]))*Math.sin(dLng/2)**2; return 2*R*Math.asin(Math.sqrt(h)); }
+
+/* ---------- Exempeldata (tydligt märkt, inga påhittade omdömen) ---------- */
+const SEED_SITTERS = [
+ {id:"s1",name:"Elin Lindqvist",city:"Umeå",off:[.006,-.01],types:["barn"],price:160,bio:"Förskollärarstudent som gärna hittar på pyssel och utelek. Vana vid barn från 1 år.",exp:"4 år som barnvakt",lang:"Svenska, engelska"},
+ {id:"s2",name:"Oskar Nyström",city:"Umeå",off:[-.012,.02],types:["hund"],price:140,bio:"Springer långa rundor längs Umeälven. Erfaren av stora raser och unghundar.",exp:"Egen hund i 8 år",lang:"Svenska"},
+ {id:"s3",name:"Amina Yusuf",city:"Umeå",off:[.015,.008],types:["barn","hund"],price:175,bio:"Undersköterska som tar både barn och hund. Lugn och strukturerad.",exp:"6 år i vården",lang:"Svenska, somaliska, engelska"},
+ {id:"s4",name:"Johan Berglund",city:"Holmsund",off:[0,0],types:["hund"],price:120,bio:"Pensionär med stor trädgård. Tar emot hundar dagtid, gärna äldre och lugna.",exp:"Hundägare hela livet",lang:"Svenska"},
+ {id:"s5",name:"Sara Öberg",city:"Skellefteå",off:[.004,.01],types:["barn"],price:150,bio:"Fritidsledare som läser sagor och bakar. Kan hämta på förskola.",exp:"5 år på fritids",lang:"Svenska, engelska"},
+ {id:"s6",name:"Linnea Holm",city:"Stockholm",off:[.01,-.02],types:["barn"],price:210,bio:"Lärarstudent på Södermalm, kvällar och helger.",exp:"3 år som barnvakt",lang:"Svenska, franska"},
+ {id:"s7",name:"Ali Rahimi",city:"Göteborg",off:[-.01,.01],types:["hund"],price:150,bio:"Promenader i Slottsskogen, max tre hundar åt gången.",exp:"2 år som hundrastare",lang:"Svenska, dari, engelska"},
+ {id:"s8",name:"Maja Strand",city:"Uppsala",off:[0,.01],types:["barn","hund"],price:180,bio:"Psykologstudent som gillar både barn och djur.",exp:"3 år",lang:"Svenska, engelska"}
+].map(s=>({...s,example:true,lat:CITIES[s.city][0]+s.off[0],lng:CITIES[s.city][1]+s.off[1],photo:null}));
+
+/* ---------- Lagring (bara i den här webbläsaren) ---------- */
+const KEY="passa-v2";
+function freshState(){ return {sitters:[],bookings:[],messages:[],reviews:[],me:{name:"",city:"Umeå"},search:{type:"alla",city:"Umeå",radius:"50",date:today(),sort:"avstand"}}; }
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY)) || freshState(); } catch(e){ S = freshState(); }
+S = Object.assign(freshState(), S);
+let storageOk = true;
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); storageOk=true; } catch(e){ storageOk=false; toast("Kunde inte spara i webbläsaren. Ändringen gäller tills du laddar om."); } }
+const allSitters = () => [...S.sitters, ...SEED_SITTERS];
+const getSitter = id => allSitters().find(s=>s.id===id);
+const myName = () => S.me.name.trim() || "Du";
+
+function ratingOf(id){ const r=S.reviews.filter(x=>x.sitterId===id); if(!r.length) return null; return {avg:r.reduce((a,b)=>a+b.stars,0)/r.length,n:r.length}; }
+function starStr(v){ const f=Math.round(v); return "★".repeat(f)+"☆".repeat(5-f); }
+const AV=[["#173a3b","#fbf7ee"],["#fd795b","#173a3b"],["#2f6b5e","#fbf7ee"],["#f3c9a8","#173a3b"],["#4c5d8a","#fbf7ee"]];
+function avatar(s,cls=""){ const ini=s.name.split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase(); let h=0; for(const ch of s.name) h=(h*31+ch.charCodeAt(0))>>>0; const [bg,fg]=AV[h%AV.length]; return `<div class="avatar ${cls}" aria-hidden="true" style="background:${bg};color:${fg}">${s.photo && /^data:image\//.test(s.photo) ? `<img src="${esc(s.photo)}" alt="">` : esc(ini)}</div>`; }
+function typeChips(s){ return s.types.map(t=>`<span class="chip">${t==="barn"?"Barnvakt":"Hundvakt"}</span>`).join("") + (s.example?`<span class="chip ex">Exempelprofil</span>`:`<span class="chip ok">Din annons</span>`); }
+function distTo(s){ const c=findCity(S.search.city); return c? km(CITIES[c],[s.lat,s.lng]) : null; }
+function distLabel(d){ return d==null? "" : d<1? "< 1 km bort" : Math.round(d)+" km bort"; }
+
+/* ---------- Ikoner ---------- */
+const I = {
+ check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>',
+ star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>',
+ phone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg>',
+ pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>',
+ search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>',
+ cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+ chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>',
+ plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>',
+ user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>'
+};
+
+/* ---------- Routing ---------- */
+function go(h){ if(location.hash==="#"+h) render(); else location.hash=h; }
+window.addEventListener("hashchange",()=>{ render(); window.scrollTo(0,0); });
+
+function renderTabs(route){
+  const unread = S.messages.filter(m=>!m.read && !m.mine).length;
+  const t=[["start","Sök",I.search,["start","resultat","passare"]],["bokningar","Bokningar",I.cal,["bokningar","boka"]],["meddelanden","Meddelanden",I.chat,["meddelanden","chatt"]],["annons","Annonsera",I.plus,["annons"]],["profil","Profil",I.user,["profil"]]];
+  $("#tabs").innerHTML = t.map(([h,l,ic,m])=>`<a href="#${h}" ${m.includes(route)?'aria-current="page"':""}>${ic}<span>${l}${h==="meddelanden"&&unread?`<span class="badge">${unread}</span>`:""}</span></a>`).join("");
+}
+
+function render(){
+  const h = (location.hash||"#start").slice(1);
+  const [route,arg] = h.includes("-") ? [h.slice(0,h.indexOf("-")),h.slice(h.indexOf("-")+1)] : [h,null];
+  const views={start,resultat,passare,boka,bokningar,meddelanden,chatt,annons,profil};
+  const v = views[route] || start;
+  renderTabs(views[route]?route:"start");
+  const key = views[route]?route:"start";
+  const narrow = ["boka","bokningar","meddelanden","chatt","annons","profil"].includes(key);
+  const body = v(arg);
+  $("#app").innerHTML = (key==="start"? body : `<div class="wrap${narrow?" narrow":""}">${body}</div>`) +
+    `<footer class="foot"><div class="inner"><span><b style="color:var(--ink)">Passa</b> · Prototyp för barn- och hundpassning</span><span>Betalning med Swish direkt mellan kund och passare</span></div></footer>`;
+  const t = {start:"Passa",resultat:"Sökresultat · Passa",bokningar:"Mina bokningar · Passa",meddelanden:"Meddelanden · Passa",annons:"Skapa annons · Passa",profil:"Profil · Passa"}[route];
+  document.title = t || "Passa";
+  (after[route]||(()=>{}))(arg);
+}
+const after = {};
+
+/* ---------- Vyer ---------- */
+function sitterCard({x,d,r}){
+  return `<article class="card scard"><div class="scard-top">${avatar(x)}<div><h3 class="trunc">${esc(x.name)}</h3><p class="muted small trunc">${esc(x.city)}${d!=null?" · "+distLabel(d):""}</p></div><div class="price">${kr(x.price)}<small>per timme</small></div></div>
+   <p class="clamp small">${esc(x.bio)}</p><div class="chips">${typeChips(x)}</div>
+   <div class="scard-foot"><span class="small">${r?`<span class="stars" aria-label="${r.avg.toFixed(1)} av 5">★</span> <b>${r.avg.toFixed(1)}</b> <span class="muted">(${r.n} omdömen)</span>`:`<span class="muted">Inga omdömen än</span>`}</span><a class="btn small" href="#passare-${esc(x.id)}">Visa profil</a></div></article>`;
+}
+
+function start(){
+  const s=S.search, city=findCity(s.city)||"Umeå";
+  const near=allSitters().map(x=>({x,d:km(CITIES[city],[x.lat,x.lng]),r:ratingOf(x.id)})).sort((a,b)=>a.d-b.d).slice(0,3);
+  return `<section class="band"><div class="inner">
+    <div><p class="eyebrow">Barn- och hundpassning</p>
+      <h1>Någon att lita på, <em>nära dig.</em></h1>
+      <p class="lead">Hitta barnvakt eller hundvakt i din ort, prata ihop er i appen och betala smidigt med Swish efter passet.</p>
+      <ul class="checks"><li>${I.check}Omdömen kommer bara från genomförda pass</li><li>${I.check}Swish direkt till passaren, utan mellanhand</li><li>${I.check}Chatta innan ni bestämmer något</li></ul></div>
+    <form id="searchForm" class="searchcard"><h2>Vad behöver du hjälp med?</h2>
+      <div class="choice" role="group" aria-label="Vad behöver du?">
+        <button type="button" data-type="barn" aria-pressed="${s.type==="barn"}"><b>Barnvakt</b><span class="muted small">Kvällar, hämtning, helger</span></button>
+        <button type="button" data-type="hund" aria-pressed="${s.type==="hund"}"><b>Hundvakt</b><span class="muted small">Promenader, dagis, övernattning</span></button>
+      </div>
+      <div class="grid2">
+        <label for="f-city">Ort<input id="f-city" list="cityList" value="${esc(s.city)}" autocomplete="off" placeholder="t.ex. Umeå"></label>
+        <label for="f-radius">Avstånd<select id="f-radius">${[["10","Inom 10 km"],["50","Inom 50 km"],["150","Inom 150 km"],["alla","Hela Sverige"]].map(([v,l])=>`<option value="${v}" ${s.radius===v?"selected":""}>${l}</option>`).join("")}</select></label>
+      </div>
+      <label for="f-date">Datum<input id="f-date" type="date" min="${today()}" value="${esc(s.date>=today()?s.date:today())}"></label>
+      <datalist id="cityList">${Object.keys(CITIES).sort((a,b)=>a.localeCompare(b,"sv")).map(c=>`<option value="${c}">`).join("")}</datalist>
+      <button class="btn coral" type="submit">${I.search.replace("<svg",'<svg width="18" height="18"')} Visa passare</button>
+    </form></div></section>
+
+  <section class="section"><div class="section-head"><h2>Så fungerar det</h2></div>
+    <div class="steps3">
+      <div class="card step"><span class="num">1</span><h3>Sök och jämför</h3><p class="muted small">Filtrera på barn eller hund, avstånd och pris. Läs profiler och omdömen.</p></div>
+      <div class="card step"><span class="num">2</span><h3>Chatta och boka</h3><p class="muted small">Ställ frågor, skicka en förfrågan med datum och tid och se kostnaden direkt.</p></div>
+      <div class="card step"><span class="num">3</span><h3>Betala med Swish</h3><p class="muted small">Efter passet swishar du passaren. Nummer, belopp och meddelande står färdigt att kopiera.</p></div>
+    </div></section>
+
+  <section class="section"><div class="section-head"><h2>Passare nära ${esc(city)}</h2><a class="btn ghost small" href="#resultat">Visa alla</a></div>
+    <div class="sgrid">${near.map(sitterCard).join("")}</div></section>
+
+  <section class="section"><div class="section-head"><h2>Tryggt för båda parter</h2></div>
+    <div class="trust">
+      <div class="card"><span class="ico">${I.star}</span><h3>Ärliga omdömen</h3><p class="muted small">Bara den som har haft ett genomfört pass kan lämna omdöme, och betyget räknas om direkt.</p></div>
+      <div class="card"><span class="ico">${I.phone}</span><h3>Pengarna går direkt</h3><p class="muted small">Passa tar inte emot några pengar. Passaren bekräftar i appen när betalningen har kommit.</p></div>
+      <div class="card"><span class="ico">${I.pin}</span><h3>Riktiga avstånd</h3><p class="muted small">Avståndet räknas från din ort till passaren, så du ser vem som faktiskt bor nära.</p></div>
+    </div>
+    <div class="cta"><div class="stack" style="gap:6px"><h2>Vill du tjäna pengar som passare?</h2><p class="muted">Skapa en annons på några minuter och ta emot betalning med Swish.</p></div><a class="btn coral" href="#annons">Skapa annons</a></div>
+    <p class="note small" style="margin-top:24px"><b>Prototyp:</b> profilerna är exempel och ingen identitet är kontrollerad. Det du skapar sparas bara i din egen webbläsare.</p>
+  </section>`;
+}
+after.start = ()=>{
+  document.querySelectorAll(".choice button").forEach(b=>b.onclick=()=>{ S.search.type = S.search.type===b.dataset.type?"alla":b.dataset.type; save(); render(); });
+  $("#searchForm").onsubmit = e=>{ e.preventDefault(); S.search.city=$("#f-city").value.trim(); S.search.radius=$("#f-radius").value; S.search.date=$("#f-date").value; save(); go("resultat"); };
+};
+
+function resultat(){
+  const s=S.search, city=findCity(s.city);
+  let list = allSitters().filter(x=> s.type==="alla" || x.types.includes(s.type));
+  list = list.map(x=>({x,d:distTo(x),r:ratingOf(x.id)}));
+  if(city && s.radius!=="alla") list = list.filter(o=>o.d<=+s.radius);
+  const sorters={avstand:(a,b)=>(a.d??1e9)-(b.d??1e9),pris:(a,b)=>a.x.price-b.x.price,betyg:(a,b)=>(b.r?.avg??0)-(a.r?.avg??0)};
+  list.sort(sorters[s.sort]||sorters.avstand);
+  const where = city? (s.radius==="alla"?`nära ${city}`:`inom ${s.radius} km från ${city}`) : "i hela Sverige";
+  return `<div class="stack">
+   <div class="stack" style="gap:6px"><h1 style="font-size:clamp(1.6rem,4vw,2.2rem)">${list.length} passare ${esc(where)}</h1>
+   <p class="muted small">${s.date?`För ${esc(fmtDate(s.date).replace(/\.$/,""))}. `:""}${!city && s.city?`Vi känner inte igen orten ”${esc(s.city)}”, så alla visas. `:""}<a href="#start">Ändra sökning</a></p></div>
+   <div class="card toolbar">
+     <div class="seg" role="group" aria-label="Typ">${[["alla","Alla"],["barn","Barn"],["hund","Hund"]].map(([v,l])=>`<button type="button" data-t="${v}" aria-pressed="${s.type===v}">${l}</button>`).join("")}</div>
+     <label for="f-sort" style="flex-direction:row;align-items:center;gap:8px">Sortera<select id="f-sort" style="width:auto">${[["avstand","Avstånd"],["pris","Lägst pris"],["betyg","Betyg"]].map(([v,l])=>`<option value="${v}" ${s.sort===v?"selected":""}>${l}</option>`).join("")}</select></label>
+   </div>
+   ${list.length? `<div class="sgrid">${list.map(sitterCard).join("")}</div>`
+   : `<div class="card empty"><p><b>Inga passare inom ${esc(s.radius)} km.</b></p><p class="small">Prova ett större avstånd eller välj ”Hela Sverige”.</p><button class="btn ghost small" id="widen" style="margin-top:12px">Visa hela Sverige</button></div>`}
+  </div>`;
+}
+after.resultat=()=>{
+  document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{S.search.type=b.dataset.t;save();render();});
+  $("#f-sort").onchange=e=>{S.search.sort=e.target.value;save();render();};
+  const w=$("#widen"); if(w) w.onclick=()=>{S.search.radius="alla";save();render();};
+};
+
+function passare(id){
+  const s=getSitter(id); if(!s) return `<div class="card empty">Profilen finns inte längre. <a href="#resultat">Tillbaka till sökningen</a></div>`;
+  const r=ratingOf(s.id), revs=S.reviews.filter(x=>x.sitterId===s.id).sort((a,b)=>b.ts-a.ts), d=distTo(s);
+  const first=esc(s.name.split(" ")[0]);
+  return `<div class="stack"><button class="back" onclick="history.back()">← Tillbaka</button>
+   <div class="pgrid"><div class="stack" style="gap:20px">
+   <div class="phead">${avatar(s,"lg")}<div class="stack" style="gap:6px"><h1 style="font-size:clamp(1.8rem,4vw,2.4rem)">${esc(s.name)}</h1><p class="muted">${esc(s.city)}${d!=null?" · "+distLabel(d):""}${r?` · <span class="stars">★</span> ${r.avg.toFixed(1)} (${r.n})`:""}</p><div class="chips">${typeChips(s)}</div></div></div>
+   <div class="card stack" style="gap:14px"><h2>Om ${first}</h2><p>${esc(s.bio)}</p><hr>
+     <dl class="facts" style="margin:0"><div><dt>Erfarenhet</dt><dd>${esc(s.exp||"Ej angivet")}</dd></div><div><dt>Språk</dt><dd>${esc(s.lang||"Ej angivet")}</dd></div><div><dt>Passar</dt><dd>${s.types.map(t=>t==="barn"?"Barn":"Hundar").join(" och ")}</dd></div><div><dt>Identitet</dt><dd>Inte kontrollerad</dd></div></dl></div>
+   <section class="stack" style="gap:10px"><h2>Omdömen ${r?`<span class="stars small">${starStr(r.avg)}</span> <span class="muted small">${r.avg.toFixed(1)} av 5</span>`:""}</h2>
+   ${revs.length? revs.map(v=>`<div class="card stack" style="gap:4px"><div class="row" style="justify-content:space-between"><b>${esc(v.author)}</b><span class="stars" aria-label="${v.stars} av 5">${starStr(v.stars)}</span></div><p>${esc(v.text)}</p><p class="muted small">Efter pass ${esc(fmtDate(v.date))}</p></div>`).join("")
+     : `<p class="muted">Inga omdömen än. Omdömen kan bara lämnas efter en genomförd bokning.</p>`}
+   </section></div>
+   <aside class="card stack" style="gap:14px"><div><span class="bigprice">${kr(s.price)}</span> <span class="muted">per timme</span></div>
+     <a class="btn coral" href="#boka-${esc(s.id)}">Skicka bokningsförfrågan</a><a class="btn ghost" href="#chatt-${esc(s.id)}">Skriv till ${first}</a><hr>
+     <div class="paylist"><b>Betalning</b><div><span>Swish</span><span class="muted">${s.swish?esc(fmtSwish(s.swish)):s.example?"Exempelprofil":"Nummer saknas"}</span></div><div><span>Klarna</span><span class="muted">Kommer senare</span></div></div>
+     <p class="muted small">Du betalar först efter passet. Ingen avgift tas ut av Passa.</p></aside>
+   </div></div>`;
+}
+
+function boka(id){
+  const s=getSitter(id); if(!s) return `<div class="card empty">Profilen finns inte. <a href="#resultat">Tillbaka</a></div>`;
+  const t=s.types.length>1?"":s.types[0];
+  return `<div class="stack"><button class="back" onclick="history.back()">← Tillbaka</button>
+   <div class="row">${avatar(s)}<div><h2>Boka ${esc(s.name.split(" ")[0])}</h2><p class="muted small">${kr(s.price)} per timme</p></div></div>
+   <form id="bookForm" class="card stack">
+    ${s.types.length>1?`<label for="b-type">Vad gäller det?<select id="b-type"><option value="barn">Barnpassning</option><option value="hund">Hundpassning</option></select></label>`:`<input type="hidden" id="b-type" value="${t}">`}
+    <div class="grid2"><label for="b-date">Datum<input id="b-date" type="date" required min="${today()}" value="${esc(S.search.date>=today()?S.search.date:today())}"></label>
+    <label for="b-time">Starttid<input id="b-time" type="time" required value="17:00"></label></div>
+    <label for="b-hours">Antal timmar<input id="b-hours" type="number" min="1" max="24" step="0.5" required value="3"></label>
+    <label for="b-note">Bra att veta<textarea id="b-note" maxlength="600" placeholder="Ålder, allergier, rutiner, hundens ras…"></textarea></label>
+    <div class="row" style="justify-content:space-between"><span class="muted">Uppskattad kostnad</span><b id="b-sum" style="font-size:1.25rem;font-variant-numeric:tabular-nums">${kr(s.price*3)}</b></div>
+    <fieldset style="border:0;padding:0;margin:0" class="stack"><legend style="font-weight:600;font-size:.9rem;margin-bottom:8px">Hur vill du betala?</legend>
+     <label class="payopt" for="pm-swish"><input type="radio" name="pm" id="pm-swish" value="swish" checked><span><b>Swish</b><span class="muted small">Du swishar ${esc(s.name.split(" ")[0])} direkt efter passet. Du får nummer, belopp och meddelande att kopiera.</span></span></label>
+     <label class="payopt off" for="pm-klarna"><input type="radio" name="pm" id="pm-klarna" value="klarna" disabled><span><b>Klarna</b><span class="muted small">Faktura eller delbetalning. Kommer när Passa har ett avtal med Klarna.</span></span></label>
+    </fieldset>
+    <button class="btn coral" type="submit">Skicka förfrågan</button>
+   </form></div>`;
+}
+after.boka=id=>{
+  const s=getSitter(id); if(!s) return;
+  const upd=()=>$("#b-sum").textContent=kr(s.price*(+$("#b-hours").value||0));
+  $("#b-hours").oninput=upd;
+  $("#bookForm").onsubmit=e=>{e.preventDefault();
+    const b={id:uid(),sitterId:s.id,type:$("#b-type").value,date:$("#b-date").value,time:$("#b-time").value,hours:+$("#b-hours").value,note:$("#b-note").value.trim(),price:s.price,status:"forfragan",created:Date.now(),payMethod:"swish",pay:"obetald"};
+    S.bookings.push(b);
+    S.messages.push({id:uid(),sitterId:s.id,mine:true,read:true,ts:Date.now(),text:`Bokningsförfrågan: ${fmtDate(b.date)} kl ${b.time}, ${b.hours} h.${b.note?" "+b.note:""}`});
+    save(); toast("Förfrågan skickad"); go("bokningar");
+  };
+};
+
+let bookTab="kommande";
+function bokningar(){
+  const isPast=b=>b.status!=="forfragan" || b.date<today();
+  const list=S.bookings.filter(b=> bookTab==="kommande"? !isPast(b) : isPast(b)).sort((a,b)=> bookTab==="kommande"? a.date.localeCompare(b.date) : b.date.localeCompare(a.date));
+  const label={forfragan:["Förfrågan skickad","req"],genomford:["Genomförd","done"],avbokad:["Avbokad","cancel"]};
+  return `<div class="stack"><h1>Mina bokningar</h1>
+   <div class="seg" role="group" aria-label="Visa">${[["kommande","Kommande"],["tidigare","Tidigare"]].map(([v,l])=>`<button type="button" data-tab="${v}" aria-pressed="${bookTab===v}">${l}</button>`).join("")}</div>
+   ${list.length? list.map(b=>{const s=getSitter(b.sitterId)||{name:"Borttagen passare",types:[],id:""}; const reviewed=S.reviews.some(r=>r.bookingId===b.id); const [lt,lc]=label[b.status]||label.forfragan; const overdue=b.status==="forfragan"&&b.date<today();
+     return `<article class="card stack" style="gap:10px"><div class="row" style="justify-content:space-between"><div class="row">${avatar(s)}<div><h3>${esc(s.name)}</h3><p class="muted small">${b.type==="hund"?"Hundpassning":"Barnpassning"}</p></div></div><span class="status ${lc}">${lt}</span></div>
+     <p class="small" style="font-variant-numeric:tabular-nums">${esc(fmtDate(b.date))} kl ${esc(b.time)} · ${esc(b.hours)} h · ca ${kr(b.price*b.hours)}</p>
+     ${b.note?`<p class="muted small">${esc(b.note)}</p>`:""}
+     ${b.status!=="avbokad"?`<div class="row small"><span class="muted">Betalning:</span>${payChip(b)}</div>`:""}
+     <div class="row">
+      ${b.status!=="avbokad"&&(b.pay||"obetald")==="obetald"?`<button class="btn small ${b.status==="genomford"?"coral":""}" data-act="pay" data-id="${b.id}">Betala med Swish</button>`:""}
+      ${b.pay==="betald"&&s.id&&!s.example?`<button class="btn small" data-act="confirm" data-id="${b.id}">Bekräfta mottagen betalning</button>`:""}
+      ${b.status==="forfragan"?`${overdue?`<button class="btn small" data-act="done" data-id="${b.id}">Markera som genomförd</button>`:""}<button class="btn small ghost" data-act="cancel" data-id="${b.id}">Avboka</button>`:""}
+      ${b.status==="genomford"&&!reviewed?`<button class="btn small coral" data-act="review" data-id="${b.id}">Lämna omdöme</button>`:""}
+      ${b.status==="genomford"&&reviewed?`<span class="muted small">Omdöme lämnat</span>`:""}
+      ${s.id?`<a class="btn small ghost" href="#chatt-${esc(s.id)}">Meddelande</a>`:""}
+     </div>
+     <div id="rv-${b.id}"></div></article>`}).join("")
+   : `<div class="card empty"><p><b>${bookTab==="kommande"?"Inga kommande bokningar.":"Inga tidigare bokningar."}</b></p><p class="small">${bookTab==="kommande"?"Hitta en passare och skicka en förfrågan.":"Genomförda och avbokade pass hamnar här."}</p>${bookTab==="kommande"?`<a class="btn small" style="margin-top:12px" href="#start">Sök passare</a>`:""}</div>`}
+   ${bookTab==="kommande"&&S.bookings.length?`<p class="muted small">Ett pass kan markeras som genomfört när datumet har passerat. Då kan du lämna ett omdöme.</p>`:""}
+  </div>`;
+}
+after.bokningar=()=>{
+  document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{bookTab=b.dataset.tab;render();});
+  document.querySelectorAll("[data-act]").forEach(btn=>btn.onclick=()=>{
+    const b=S.bookings.find(x=>x.id===btn.dataset.id); if(!b) return;
+    if(btn.dataset.act==="cancel"){ b.status="avbokad"; save(); toast("Bokningen är avbokad"); render(); }
+    if(btn.dataset.act==="done"){ b.status="genomford"; save(); bookTab="tidigare"; toast("Markerad som genomförd"); render(); }
+    if(btn.dataset.act==="review") reviewForm(b);
+    if(btn.dataset.act==="pay") payForm(b);
+    if(btn.dataset.act==="confirm"){ b.pay="bekraftad"; save(); toast("Betalningen är bekräftad"); render(); }
+  });
+};
+function payChip(b){
+  const p=b.pay||"obetald";
+  const m={obetald:["Ej betald","req"],betald:["Swishad, väntar på bekräftelse","paid"],bekraftad:["Betald och bekräftad","done"]}[p];
+  return `<span class="status ${m[1]}">${m[0]}</span>`;
+}
+function payForm(b){
+  const s=getSitter(b.sitterId); if(!s) return;
+  const box=$("#rv-"+b.id), amount=Math.round(b.price*b.hours), ref=payRef(b);
+  const hasNr = s.swish && validSwish(s.swish);
+  box.innerHTML=`<div class="paybox"><b>Betala ${esc(s.name.split(" ")[0])} med Swish</b>
+   ${hasNr?"":`<p class="note small">${s.example?"Exempelprofilen har inget riktigt Swish-nummer. Du kan testa flödet, men swisha inte några pengar.":"Passaren har inte lagt in något Swish-nummer. Fråga efter det i meddelanden."}</p>`}
+   ${hasNr?`<div class="copyrow"><div><span class="muted small">Swish-nummer</span><br><code>${esc(fmtSwish(s.swish))}</code></div><button type="button" class="btn small ghost" data-copy="${esc(cleanSwish(s.swish))}">Kopiera</button></div>`:""}
+   <div class="copyrow"><div><span class="muted small">Belopp</span><br><code>${amount} kr</code></div><button type="button" class="btn small ghost" data-copy="${amount}">Kopiera</button></div>
+   <div class="copyrow"><div><span class="muted small">Meddelande</span><br><code>${esc(ref)}</code></div><button type="button" class="btn small ghost" data-copy="${esc(ref)}">Kopiera</button></div>
+   <ol class="steps small"><li>Öppna Swish-appen och välj Betala.</li><li>Fyll i numret, beloppet och meddelandet ovan.</li><li>Godkänn med BankID i Swish och kom sedan tillbaka hit.</li></ol>
+   <div class="row"><button type="button" class="btn coral small" id="paid-${b.id}">Jag har swishat ${amount} kr</button><button type="button" class="btn ghost small" id="paycancel-${b.id}">Avbryt</button></div>
+   <p class="muted small">Passa tar inte emot några pengar. Betalningen går direkt mellan er och visas inte här förrän du markerar den.</p></div>`;
+  box.querySelectorAll("[data-copy]").forEach(x=>x.onclick=()=>copyText(x.dataset.copy,x));
+  $("#paycancel-"+b.id).onclick=()=>{ box.innerHTML=""; };
+  $("#paid-"+b.id).onclick=()=>{
+    b.pay="betald"; b.paidAt=Date.now();
+    S.messages.push({id:uid(),sitterId:s.id,mine:true,read:true,ts:Date.now(),text:`Jag har swishat ${amount} kr med meddelandet ${ref}.`});
+    if(s.example) b.pay="bekraftad";
+    save(); toast(s.example?"Testbetalning markerad som klar":"Markerad som swishad. Passaren bekräftar när pengarna kommit."); render();
+  };
+}
+function reviewForm(b){
+  const box=$("#rv-"+b.id); let stars=0;
+  box.innerHTML=`<form class="stack" style="gap:10px"><hr><b>Hur gick det?</b><div class="rate" role="group" aria-label="Betyg">${[1,2,3,4,5].map(n=>`<button type="button" data-n="${n}" aria-label="${n} av 5">★</button>`).join("")}</div>
+   <label for="rv-text-${b.id}">Kommentar<textarea id="rv-text-${b.id}" maxlength="500" required placeholder="Beskriv passet kort"></textarea></label><button class="btn coral small" type="submit" style="align-self:flex-start">Publicera omdöme</button></form>`;
+  const btns=box.querySelectorAll(".rate button");
+  btns.forEach(x=>x.onclick=()=>{stars=+x.dataset.n;btns.forEach(y=>y.classList.toggle("on",+y.dataset.n<=stars));});
+  box.querySelector("form").onsubmit=e=>{e.preventDefault(); if(!stars){toast("Välj ett betyg mellan 1 och 5");return;}
+    S.reviews.push({id:uid(),bookingId:b.id,sitterId:b.sitterId,stars,text:$("#rv-text-"+b.id).value.trim(),author:myName(),date:b.date,ts:Date.now()});
+    save(); toast("Omdömet är publicerat"); render(); };
+}
+
+function meddelanden(){
+  const ids=[...new Set(S.messages.map(m=>m.sitterId))].filter(getSitter);
+  const conv=ids.map(id=>{const ms=S.messages.filter(m=>m.sitterId===id);return {s:getSitter(id),last:ms[ms.length-1]};}).sort((a,b)=>b.last.ts-a.last.ts);
+  return `<div class="stack"><h1>Meddelanden</h1>
+  ${conv.length? conv.map(({s,last})=>`<button class="list-btn" data-s="${esc(s.id)}">${avatar(s)}<div style="flex:1"><div class="row" style="justify-content:space-between"><b>${esc(s.name)}</b><span class="muted small">${esc(fmtTime(last.ts))}</span></div><p class="muted small trunc">${last.mine?"Du: ":""}${esc(last.text)}</p></div></button>`).join("")
+   : `<div class="card empty"><p><b>Inga konversationer än.</b></p><p class="small">Öppna en profil och välj ”Skriv ett meddelande”.</p></div>`}
+  </div>`;
+}
+after.meddelanden=()=>document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>go("chatt-"+b.dataset.s));
+
+function chatt(id){
+  const s=getSitter(id); if(!s) return `<div class="card empty">Konversationen finns inte. <a href="#meddelanden">Till meddelanden</a></div>`;
+  const ms=S.messages.filter(m=>m.sitterId===id);
+  return `<div class="stack"><button class="back" onclick="history.back()">← Tillbaka</button>
+   <a class="row" href="#passare-${esc(s.id)}" style="text-decoration:none;color:inherit">${avatar(s)}<div><h2>${esc(s.name)}</h2><p class="muted small">Visa profil</p></div></a>
+   <div class="card stack"><div class="chat" id="chatBox">${ms.length? ms.map(m=>`<div class="msg ${m.mine?"me":""}">${esc(m.text)}<time>${esc(fmtTime(m.ts))}</time></div>`).join("") : `<p class="muted small empty">Skriv ditt första meddelande till ${esc(s.name.split(" ")[0])}.</p>`}</div>
+   <form id="msgForm" class="row" style="flex-wrap:nowrap"><label for="m-text" style="flex:1" class="sr"><span hidden>Meddelande</span><input id="m-text" maxlength="1000" autocomplete="off" placeholder="Skriv ett meddelande" required></label><button class="btn" type="submit">Skicka</button></form></div>
+   ${s.example?`<p class="muted small">Det här är en exempelprofil, så ingen svarar. Meddelanden sparas bara i din webbläsare.</p>`:""}</div>`;
+}
+after.chatt=id=>{
+  S.messages.forEach(m=>{if(m.sitterId===id)m.read=true;}); save();
+  const box=$("#chatBox"); if(box) box.scrollTop=box.scrollHeight;
+  const f=$("#msgForm"); if(!f) return;
+  f.onsubmit=e=>{e.preventDefault(); const t=$("#m-text").value.trim(); if(!t) return; S.messages.push({id:uid(),sitterId:id,mine:true,read:true,ts:Date.now(),text:t}); save(); render(); $("#m-text")?.focus(); };
+};
+
+let pendingPhoto=null;
+function annons(){
+  const mine=S.sitters;
+  return `<div class="stack"><h1>Bli passare</h1><p class="muted">Skapa en annons så att familjer och hundägare i din närhet hittar dig.</p>
+  ${mine.length?`<div class="stack" style="gap:8px"><h3>Dina annonser</h3>${mine.map(s=>`<div class="list-btn" style="cursor:default">${avatar(s)}<div style="flex:1"><b>${esc(s.name)}</b><p class="muted small">${esc(s.city)} · ${kr(s.price)}/h</p></div><a class="btn small ghost" href="#passare-${esc(s.id)}">Visa</a><button class="btn small ghost" data-del="${esc(s.id)}">Ta bort</button></div>`).join("")}</div>`:""}
+  <form id="adForm" class="card stack">
+   <div class="row" style="gap:14px"><div id="photoPrev">${avatar({name:S.me.name||"Ny passare",photo:pendingPhoto},"lg")}</div>
+    <label for="a-photo" style="flex:1;min-width:180px">Profilbild (valfri)<input id="a-photo" type="file" accept="image/*"></label></div>
+   <label for="a-name">Namn<input id="a-name" required maxlength="60" value="${esc(S.me.name)}" placeholder="För- och efternamn"></label>
+   <div class="grid2"><label for="a-city">Ort<select id="a-city" required>${Object.keys(CITIES).sort((a,b)=>a.localeCompare(b,"sv")).map(c=>`<option ${c===(S.me.city||"Umeå")?"selected":""}>${c}</option>`).join("")}</select></label>
+    <label for="a-price">Pris per timme (kr)<input id="a-price" type="number" min="50" max="1000" step="5" required value="150"></label></div>
+   <fieldset style="border:0;padding:0;margin:0" class="stack"><legend style="font-weight:600;font-size:.9rem;margin-bottom:6px">Jag passar</legend>
+    <div class="row"><label style="flex-direction:row;align-items:center;font-weight:500" for="a-barn"><input id="a-barn" type="checkbox" checked style="width:20px;min-height:20px"> Barn</label>
+    <label style="flex-direction:row;align-items:center;font-weight:500" for="a-hund"><input id="a-hund" type="checkbox" style="width:20px;min-height:20px"> Hundar</label></div></fieldset>
+   <label for="a-bio">Om dig<textarea id="a-bio" required maxlength="600" placeholder="Vad gillar du att göra med barn eller hundar? När kan du?"></textarea></label>
+   <div class="grid2"><label for="a-exp">Erfarenhet<input id="a-exp" maxlength="80" placeholder="t.ex. 3 år som barnvakt"></label><label for="a-lang">Språk<input id="a-lang" maxlength="80" placeholder="t.ex. Svenska, engelska"></label></div>
+   <label for="a-swish">Swish-nummer för betalning<input id="a-swish" inputmode="tel" maxlength="16" placeholder="070-123 45 67"><span class="muted small" style="font-weight:400">Kunder swishar dig direkt efter passet. Klarna kommer senare.</span></label>
+   <p class="note small">Din annons visas bara för dig i den här webbläsaren. Identitetskontroll finns inte än, så annonsen märks inte som verifierad.</p>
+   <button class="btn coral" type="submit">Publicera annons</button>
+  </form></div>`;
+}
+after.annons=()=>{
+  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{ if(b.dataset.confirm){ S.sitters=S.sitters.filter(s=>s.id!==b.dataset.del); save(); toast("Annonsen är borttagen"); render(); } else { b.dataset.confirm="1"; b.textContent="Bekräfta"; b.classList.add("coral"); }});
+  $("#a-photo").onchange=e=>{ const f=e.target.files[0]; if(!f) return; if(!/^image\//.test(f.type)){toast("Välj en bildfil");return;}
+    const rd=new FileReader(); rd.onload=()=>{ const img=new Image(); img.onload=()=>{ const c=document.createElement("canvas"),sz=240; c.width=c.height=sz; const m=Math.min(img.width,img.height); c.getContext("2d").drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,sz,sz); pendingPhoto=c.toDataURL("image/jpeg",.82); $("#photoPrev").innerHTML=avatar({name:"x",photo:pendingPhoto},"lg"); }; img.onerror=()=>toast("Bilden kunde inte läsas"); img.src=rd.result; }; rd.readAsDataURL(f); };
+  $("#adForm").onsubmit=e=>{e.preventDefault();
+    const types=[$("#a-barn").checked&&"barn",$("#a-hund").checked&&"hund"].filter(Boolean);
+    if(!types.length){toast("Välj barn, hundar eller båda");return;}
+    const sw=$("#a-swish").value.trim();
+    if(sw && !validSwish(sw)){toast("Skriv ett svenskt mobilnummer, t.ex. 070-123 45 67");$("#a-swish").focus();return;}
+    const city=$("#a-city").value, c=CITIES[city];
+    const s={id:"u"+uid(),name:$("#a-name").value.trim(),city,lat:c[0],lng:c[1],types,price:+$("#a-price").value,bio:$("#a-bio").value.trim(),exp:$("#a-exp").value.trim(),lang:$("#a-lang").value.trim(),photo:pendingPhoto,swish:sw?cleanSwish(sw):"",example:false};
+    S.sitters.unshift(s); if(!S.me.name) S.me.name=s.name; pendingPhoto=null; save(); toast("Annonsen är publicerad"); go("passare-"+s.id);
+  };
+};
+
+function profil(){
+  return `<div class="stack"><h1>Profil</h1>
+  <form id="meForm" class="card stack"><label for="p-name">Ditt namn<input id="p-name" maxlength="60" value="${esc(S.me.name)}" placeholder="Visas på dina omdömen"></label>
+   <label for="p-city">Hemort<select id="p-city">${Object.keys(CITIES).sort((a,b)=>a.localeCompare(b,"sv")).map(c=>`<option ${c===S.me.city?"selected":""}>${c}</option>`).join("")}</select></label>
+   <button class="btn" type="submit" style="align-self:flex-start">Spara</button></form>
+  <div class="card stack" style="gap:8px"><h3>Din data</h3><p class="small muted">${S.bookings.length} bokningar, ${S.messages.length} meddelanden, ${S.reviews.length} omdömen och ${S.sitters.length} egna annonser. Allt ligger bara i den här webbläsaren${storageOk?"":" (sparning fungerar inte just nu)"}.</p>
+   <button class="btn ghost small" id="reset" style="align-self:flex-start">Radera all min data</button></div>
+  <div class="card stack" style="gap:8px"><h3>Om prototypen</h3>
+   <p class="small">Sök, avståndsberäkning, bokningsförfrågningar, meddelanden, annonser och omdömen fungerar. Betalning sker med Swish direkt mellan kund och passare. Inloggning, BankID, identitetskontroll, Klarna och delning mellan användare finns inte än och kräver en riktig server.</p></div>
+  </div>`;
+}
+after.profil=()=>{
+  $("#meForm").onsubmit=e=>{e.preventDefault(); S.me.name=$("#p-name").value.trim(); S.me.city=$("#p-city").value; S.search.city=S.me.city; save(); toast("Sparat");};
+  const r=$("#reset"); r.onclick=()=>{ if(r.dataset.c){ S=freshState(); save(); toast("All data är raderad"); render(); } else { r.dataset.c="1"; r.textContent="Klicka igen för att radera allt"; r.classList.add("coral"); } };
+};
+
+render();
+})();
+</script>
+</body>
+</html>
