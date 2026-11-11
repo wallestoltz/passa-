@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Passa</title>
-<meta name="description" content="Passa hjälper familjer och hundägare att hitta en passare nära sig, boka och betala med Swish.">
+<meta name="description" content="Passa hjälper hundägare att hitta en hundvakt nära sig för promenad, hunddagis och övernattning, och att betala med Swish.">
 <style>
-/* Layout: grön hero med två telefoner, sedan omväxlande sektioner på krämvit botten. Innehåll max 1120px, telefonskärmar från den riktiga appen bär berättelsen */
+/* Layout: hundpassning. Grön hero med två telefoner, sedan omväxlande sektioner på krämvit botten. Innehåll max 1120px, telefonskärmar från den riktiga appen bär berättelsen */
 :root{
   --bg:#fbf7ee; --surface:#fffdf8; --ink:#173a3b; --muted:#566f6d; --line:#e9e0cd; --soft:#e2ebe6;
   --green:#173a3b; --orange:#fd795b; --on-orange:#173a3b; --note-bg:#ffe9dc; --note-ink:#7a3418; --ok:#2c7a54;
@@ -59,7 +59,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .site-head{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--band);color:var(--band-ink);border-bottom:1px solid rgba(255,255,255,.08)}
 .site-head .in{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:68px}
 .logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--font-display);font-weight:700;font-size:1.7rem;color:var(--band-ink)}
-.logo i{width:28px;height:28px;border-radius:9px 9px 9px 2px;background:var(--orange)}
+.logo i{width:30px;height:30px;border-radius:9px 9px 9px 2px;background:var(--orange);color:#173a3b;display:grid;place-items:center}
+.logo i svg{width:18px;height:18px}
 .logo b{font-weight:700}.logo b span{color:var(--orange)}
 .site-nav{display:flex;align-items:center;gap:4px}
 .site-nav a.l{color:var(--band-muted);text-decoration:none;font-weight:600;font-size:.95rem;padding:8px 12px;border-radius:10px}
@@ -81,7 +82,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .status-pill::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--orange)}
 .hero-phones{position:relative;display:flex;justify-content:center;align-items:flex-end;min-height:420px}
 .hero-phones .phone{margin-bottom:-90px}
-.hero-phones .phone.back{position:absolute;left:50%;transform:translateX(-112%) rotate(-6deg) scale(.86);transform-origin:bottom center;opacity:.95}
+.hero-phones .phone.back{position:absolute;left:50%;transform:translateX(-96%) rotate(-6deg) scale(.84);transform-origin:bottom center;opacity:.95}
 .hero-phones .phone.front{transform:translateX(18%) rotate(3deg)}
 @media (max-width:640px){.hero-phones .phone.back{display:none}.hero-phones .phone.front{transform:none}}
 
@@ -137,7 +138,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .method.soon{opacity:.7;border-style:dashed}
 .method.soon .sw{background:var(--soft);color:var(--green)}
 
-/* Passare */
+/* Hundvakter och kalender */
 .sitters{background:var(--band);color:var(--band-ink);border-radius:32px;overflow:hidden;display:grid;gap:24px;align-items:end}
 @media (min-width:900px){.sitters{grid-template-columns:1.2fr .8fr}}
 .sitters .copy{padding:40px 28px 8px;display:flex;flex-direction:column;gap:20px}
@@ -201,16 +202,26 @@ details p{padding:0 0 22px;color:var(--muted);max-width:62ch}
   .hero-phones .phone.back{animation-delay:.12s}
   @keyframes rise{from{translate:0 40px}to{translate:0 0}}
 }
+
+.svc3{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr))}
+.svc3 article{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:12px}
+.svc-ico{width:52px;height:52px;border-radius:16px;background:var(--soft);color:var(--green);display:grid;place-items:center}
+.svc-ico svg{width:26px;height:26px}
+.svc3 article:nth-child(2) .svc-ico{background:var(--note-bg);color:var(--note-ink)}
+.per{margin-top:auto;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline}
+.tip-row{margin-top:40px;background:var(--soft);border-radius:22px;padding:22px 26px;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+.tip-row p{max-width:60ch}
+.sitters .copy .btn.line{color:var(--band-ink)}
 </style>
 </head>
 <body>
 <header class="site-head"><div class="in">
-  <a class="logo" href="#top" aria-label="Passa, till toppen"><i aria-hidden="true"></i><b>Passa<span>.</span></b></a>
+  <a class="logo" href="#top" aria-label="Passa, till toppen"><i aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="5.2" cy="11.3" rx="2" ry="2.5"/><ellipse cx="9" cy="6.6" rx="2" ry="2.6"/><ellipse cx="15" cy="6.6" rx="2" ry="2.6"/><ellipse cx="18.8" cy="11.3" rx="2" ry="2.5"/><path d="M12 11.5c-3.2 0-6.2 3.7-6.2 6.4 0 1.7 1.3 2.5 3 2.5 1.3 0 2.1-.7 3.2-.7s1.9.7 3.2.7c1.7 0 3-.8 3-2.5 0-2.7-3-6.4-6.2-6.4z"/></svg></i><b>Passa<span>.</span></b></a>
   <nav class="site-nav" aria-label="Sidans delar">
+    <a class="l" href="#tjanster">Tjänster</a>
     <a class="l" href="#sa-fungerar-det">Så fungerar det</a>
+    <a class="l" href="#kalendern">Kalendern</a>
     <a class="l" href="#betalning">Betalning</a>
-    <a class="l" href="#bli-passare">Bli passare</a>
-    <a class="l" href="#trygghet">Trygghet</a>
     <a class="l" href="#fragor">Frågor</a>
     <a class="btn orange" href="app.html">Öppna appen</a>
   </nav>
@@ -220,62 +231,69 @@ details p{padding:0 0 22px;color:var(--muted);max-width:62ch}
 <section class="hero"><div class="in">
   <div class="copy">
     <span class="status-pill">Under utveckling · prova prototypen</span>
-    <h1>Någon att lita på, <em>nära dig.</em></h1>
-    <p class="lead">Passa hjälper familjer och hundägare att hitta en barnvakt eller hundvakt i sin ort. Ni chattar, bokar och betalar med Swish, allt på ett ställe.</p>
+    <h1>En trygg hundvakt, <em>när du behöver det.</em></h1>
+    <p class="lead">Passa kopplar ihop hundägare med hundvakter i närheten. Boka en promenad, hunddagis eller övernattning, chatta i appen och betala med Swish när passet är klart.</p>
     <div class="ctas">
       <a class="btn orange" href="app.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Hitta en passare</a>
-      <a class="btn line" href="app.html#annons">Bli passare</a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Hitta en hundvakt</a>
+      <a class="btn line" href="app.html#kalender">Jag vill bli hundvakt</a>
     </div>
   </div>
   <div class="hero-phones" aria-hidden="true">
-    <div class="phone back"><img src="img/profile.webp" alt="" width="585" height="1266"></div>
-    <div class="phone front"><img src="img/results.webp" alt="" width="585" height="1266"></div>
+    <div class="phone back"><img src="img/results.webp" alt="" width="585" height="1266"></div>
+    <div class="phone front"><img src="img/calendar.webp" alt="" width="585" height="1266"></div>
   </div>
 </div></section>
 
-<section class="in first" aria-labelledby="h-help">
-  <div class="sec-head"><span class="eyebrow">Två sorters hjälp</span><h2 id="h-help">För barnen och för hunden</h2>
-    <p class="lead">Varje passare visar vad de tar, var de bor och vad de tar betalt per timme. Du ser avståndet från din ort direkt.</p></div>
-  <div class="duo">
-    <article><span class="tag">Barnvakt</span><h3>När du behöver en kväll, en hämtning eller en hel lördag</h3>
-      <ul>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Kvällar och helger</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Hämtning från förskola och skola</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Skriv om allergier, rutiner och läggtider i förfrågan</li>
-      </ul>
-      <div class="from"><span class="muted small">Passaren sätter sitt eget timpris</span><a class="btn green" href="app.html">Sök barnvakt</a></div></article>
-    <article><span class="tag">Hundvakt</span><h3>När hunden behöver en promenad, sällskap eller en plats över dagen</h3>
-      <ul>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Promenader och rastning</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Hunddagis hemma hos passaren</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Skriv ras, ålder och vanor i förfrågan</li>
-      </ul>
-      <div class="from"><span class="muted small">Passaren sätter sitt eget timpris</span><a class="btn green" href="app.html">Sök hundvakt</a></div></article>
+<section class="in first" id="tjanster" aria-labelledby="h-svc">
+  <div class="sec-head"><span class="eyebrow">Tjänster</span><h2 id="h-svc">Tre sätt att få hjälp med hunden</h2>
+    <p class="lead">Varje hundvakt visar vilka tjänster de erbjuder, vilka hundstorlekar de tar emot och vad det kostar. Avståndet från din ort syns direkt.</p></div>
+  <div class="svc3">
+    <article><span class="svc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17c3 0 3.5-4 6-4s3 4 6 4 3.5-3 6-3"/><path d="M3 9c3 0 3.5-3 6-3s3 3 6 3 3.5-2 6-2" opacity=".5"/></svg></span><h3>Promenad</h3><p class="muted">Rastning medan du jobbar, en lunchrunda eller en lång skogspromenad.</p><div class="per"><span class="muted small">Pris sätts</span><b>per timme</b></div></article>
+    <article><span class="svc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></span><h3>Hunddagis</h3><p class="muted">Hunden är hos hundvakten under dagen och slipper vara ensam hemma.</p><div class="per"><span class="muted small">Pris sätts</span><b>per dag</b></div></article>
+    <article><span class="svc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></span><h3>Övernattning</h3><p class="muted">Hunden bor hos hundvakten när du reser bort, en natt eller flera.</p><div class="per"><span class="muted small">Pris sätts</span><b>per natt</b></div></article>
   </div>
 </section>
 
 <section class="in sec" id="sa-fungerar-det" aria-labelledby="h-how">
-  <div class="sec-head"><span class="eyebrow">Så fungerar det</span><h2 id="h-how">Från sökning till betalt pass i tre steg</h2></div>
+  <div class="sec-head"><span class="eyebrow">För hundägare</span><h2 id="h-how">Från sökning till betalt pass i tre steg</h2></div>
   <div class="steps">
-    <div class="step"><div class="stage"><div class="phone sm"><img src="img/results.webp" alt="Sökresultat i appen med passare nära Umeå, pris per timme och avstånd" width="585" height="1266" loading="lazy"></div></div>
-      <span class="num">1</span><h3>Sök och jämför</h3><p class="muted">Välj barn eller hund, din ort och hur långt bort passaren får bo. Sortera på avstånd, pris eller betyg.</p></div>
-    <div class="step"><div class="stage"><div class="phone sm"><img src="img/chat.webp" alt="Chatt i appen där en förälder frågar en passare om fredag kväll" width="585" height="1266" loading="lazy"></div></div>
-      <span class="num">2</span><h3>Chatta och boka</h3><p class="muted">Ställ dina frågor först. Skicka sedan en förfrågan med datum, tid och antal timmar och se vad det kostar.</p></div>
+    <div class="step"><div class="stage"><div class="phone sm"><img src="img/results.webp" alt="Sökresultat i appen med hundvakter nära Umeå, pris och avstånd" width="585" height="1266" loading="lazy"></div></div>
+      <span class="num">1</span><h3>Sök och jämför</h3><p class="muted">Välj tjänst, din ort och hur långt bort hundvakten får bo. Sortera på avstånd, pris eller betyg.</p></div>
+    <div class="step"><div class="stage"><div class="phone sm"><img src="img/chat.webp" alt="Chatt i appen där en hundägare skriver till en hundvakt" width="585" height="1266" loading="lazy"></div></div>
+      <span class="num">2</span><h3>Chatta och boka</h3><p class="muted">Ställ dina frågor först. Skicka sedan en förfrågan med datum och se direkt vad passet kostar.</p></div>
     <div class="step"><div class="stage"><div class="phone sm"><img src="img/pay.webp" alt="Swish-betalning i appen med belopp och meddelande att kopiera" width="585" height="1266" loading="lazy"></div></div>
-      <span class="num">3</span><h3>Betala med Swish</h3><p class="muted">Efter passet swishar du passaren direkt. Belopp och meddelande står färdiga att kopiera.</p></div>
+      <span class="num">3</span><h3>Betala med Swish</h3><p class="muted">Efter passet swishar du hundvakten direkt. Belopp och meddelande står färdiga att kopiera.</p></div>
+  </div>
+  <div class="tip-row"><p><b>Hittar du ingen ledig hundvakt?</b> Lägg ut ett uppdrag med din hund och dina datum, så hör hundvakter i närheten av sig.</p><a class="btn green" href="app.html#nytt">Lägg ut ett uppdrag</a></div>
+</section>
+
+<section class="in sec" id="kalendern" aria-labelledby="h-cal">
+  <div class="sitters">
+    <div class="copy">
+      <span class="eyebrow">För hundvakter</span><h2 id="h-cal">Se vem som behöver hundvakt, varje dag året runt</h2>
+      <p class="lead">Uppdragskalendern visar alla hundägare som söker hjälp. Bläddra månad för månad ett år framåt, välj en dag och se vilka hundar det gäller.</p>
+      <ol>
+        <li><div><b>Bläddra i kalendern</b><span>Varje dag visar hur många uppdrag som finns. Filtrera på ort, avstånd och tjänst.</span></div></li>
+        <li><div><b>Läs om hunden</b><span>Ras, storlek, ålder, tider och vad hundägaren betalar står i uppdraget.</span></div></li>
+        <li><div><b>Erbjud dig</b><span>Skicka ett meddelande direkt i appen. Hundägaren svarar under Meddelanden.</span></div></li>
+        <li><div><b>Få betalt med Swish</b><span>Lägg in ditt Swish-nummer i annonsen. Pengarna kommer direkt till dig efter passet.</span></div></li>
+      </ol>
+      <div style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn orange" href="app.html#kalender">Öppna kalendern</a><a class="btn line" href="app.html#annons">Skapa annons</a></div>
+    </div>
+    <div class="art" aria-hidden="true"><div class="phone"><img src="img/day.webp" alt="" width="585" height="1266"></div></div>
   </div>
 </section>
 
 <section class="in sec" id="betalning" aria-labelledby="h-pay">
   <div class="pay">
     <div class="pay-copy">
-      <span class="eyebrow">Betalning</span><h2 id="h-pay">Pengarna går direkt till passaren</h2>
-      <p class="lead">Du betalar först när passet är klart. Appen räknar ut beloppet och ger varje bokning ett eget meddelande, så att passaren ser vilken betalning som hör till vilket pass.</p>
+      <span class="eyebrow">Betalning</span><h2 id="h-pay">Pengarna går direkt till hundvakten</h2>
+      <p class="lead">Du betalar när passet är klart. Appen räknar ut beloppet och ger varje bokning ett eget meddelande, så att hundvakten ser vilken betalning som hör till vilket pass.</p>
       <ol class="track" aria-label="Betalningens steg">
         <li><span class="dot"></span><b>Ej betald</b><span>Passet är bokat eller klart</span></li>
         <li><span class="dot"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg></span><b>Swishad</b><span>Du har betalat och markerat det</span></li>
-        <li><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><b>Bekräftad</b><span>Passaren har fått pengarna</span></li>
+        <li><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><b>Betald</b><span>Hundvakten har fått pengarna</span></li>
       </ol>
       <div class="methods">
         <div class="method"><span class="sw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg></span><div><b>Swish</b><span>Finns i appen nu</span></div></div>
@@ -284,29 +302,13 @@ details p{padding:0 0 22px;color:var(--muted);max-width:62ch}
     </div>
     <div class="calc" aria-label="Räkneexempel">
       <span class="label">Räkneexempel</span>
-      <div class="row"><span>Barnpassning fredag kväll</span><span>3 h</span></div>
-      <div class="row"><span>Timpris</span><span>160 kr</span></div>
+      <div class="row"><span>Övernattning för Bamse, labrador</span><span>2 nätter</span></div>
+      <div class="row"><span>Pris per natt</span><span>450 kr</span></div>
       <hr>
-      <div class="row"><span class="muted">Att swisha</span><span class="sum">480 kr</span></div>
+      <div class="row"><span class="muted">Att swisha</span><span class="sum">900 kr</span></div>
       <div class="row small"><span class="muted">Meddelande i Swish</span><code>PASSA AB12CD3</code></div>
-      <p class="muted small">Passa tar inte emot eller håller några pengar. Betalningen går från din Swish till passarens.</p>
+      <p class="muted small">Passa tar inte emot eller håller några pengar. Betalningen går från din Swish till hundvaktens.</p>
     </div>
-  </div>
-</section>
-
-<section class="in sec" id="bli-passare" aria-labelledby="h-sit">
-  <div class="sitters">
-    <div class="copy">
-      <span class="eyebrow">Bli passare</span><h2 id="h-sit">Tjäna pengar på något du redan är bra på</h2>
-      <p class="lead">Gillar du barn eller hundar? Skapa en annons, sätt ditt eget pris och få betalt med Swish efter varje pass.</p>
-      <ol>
-        <li><div><b>Skapa din annons</b><span>Namn, ort, bild och några rader om dig. Det tar ett par minuter.</span></div></li>
-        <li><div><b>Sätt pris och lägg in Swish-nummer</b><span>Du bestämmer timpriset. Numret visas för kunden när det är dags att betala.</span></div></li>
-        <li><div><b>Svara på förfrågningar</b><span>Chatta med familjen, gör passet och bekräfta betalningen i appen.</span></div></li>
-      </ol>
-      <div><a class="btn orange" href="app.html#annons">Skapa annons</a></div>
-    </div>
-    <div class="art" aria-hidden="true"><div class="phone"><img src="img/book.webp" alt="" width="585" height="1266"></div></div>
   </div>
 </section>
 
@@ -316,19 +318,19 @@ details p{padding:0 0 22px;color:var(--muted);max-width:62ch}
   <div class="trust">
     <div class="now"><span class="label">Gäller nu</span><h3>Inbyggt i appen</h3><ul>
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Omdömen kan bara lämnas efter ett genomfört pass</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Chatta innan du skickar en bokning</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Chatta innan du bokar eller tackar ja</li>
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Priset och kostnaden syns innan du bokar</li>
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Passa hanterar inga pengar</li></ul></div>
     <div class="plan"><span class="label">Planerat inför lansering</span><h3>Det vi bygger härnäst</h3><ul>
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/></svg>Inloggning och identifiering med BankID</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/></svg>Utdrag ur belastningsregistret för barnpassare</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/></svg>Konton som delas mellan alla användare</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/></svg>Konton och uppdrag som delas mellan alla användare</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/></svg>Påminnelser när någon svarar eller bokar</li>
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/></svg>Betalning med Klarna</li></ul></div>
     <div class="tips"><span class="label">Våra tips</span><h3>Innan första passet</h3><ul>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Träffas en kort stund innan, gärna med barnet eller hunden</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Be om referenser från tidigare familjer eller hundägare</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Gå igenom rutiner, allergier och vem som ska ringas vid nödfall</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Börja med ett kort pass</li></ul></div>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Träffas en kort stund innan, tillsammans med hunden</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Gå igenom mat, mediciner, rutiner och veterinärens nummer</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Berätta hur hunden fungerar med andra hundar, barn och katter</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Börja med en kort promenad innan en övernattning</li></ul></div>
   </div>
 </section>
 
@@ -337,28 +339,28 @@ details p{padding:0 0 22px;color:var(--muted);max-width:62ch}
     <div class="sec-head" style="margin:0"><span class="eyebrow">Frågor och svar</span><h2 id="h-faq">Bra att veta</h2>
       <p class="lead">Hittar du inte svaret? Prova appen, den visar hur allt fungerar.</p></div>
     <div class="faq-list">
-      <details><summary>Vad kostar en passare?</summary><p>Varje passare sätter sitt eget timpris, och det syns på profilen. När du skickar en förfrågan räknar appen ut den totala kostnaden utifrån antal timmar.</p></details>
-      <details><summary>Hur betalar jag?</summary><p>Med Swish, efter passet. Under Mina bokningar trycker du på Betala med Swish. Där står passarens nummer, beloppet och ett meddelande som du kopierar in i Swish-appen.</p></details>
+      <details><summary>Vad kostar en hundvakt?</summary><p>Varje hundvakt sätter sina egna priser: per timme för promenad, per dag för hunddagis och per natt för övernattning. När du bokar räknar appen ut totalen innan du skickar förfrågan.</p></details>
+      <details><summary>Hur fungerar uppdragskalendern?</summary><p>Hundägare lägger ut uppdrag med datum, hund och ersättning. I kalendern ser hundvakter hur många uppdrag som finns varje dag, ett år framåt. Välj en dag för att se uppdragen och erbjud dig direkt.</p></details>
+      <details><summary>Hur lägger jag ut ett uppdrag?</summary><p>Tryck på Lägg ut uppdrag i appen. Fyll i hundens namn, ras och storlek, vilken tjänst och vilka datum det gäller, och vad du betalar. Appen föreslår ett belopp som du kan ändra.</p></details>
+      <details><summary>Hur betalar jag?</summary><p>Med Swish, efter passet. Under Bokningar trycker du på Betala med Swish. Där står hundvaktens nummer, beloppet och ett meddelande som du kopierar in i Swish-appen.</p></details>
       <details><summary>Kan jag betala med Klarna?</summary><p>Inte än. Klarna kräver ett avtal mellan Passa och Klarna, och det är planerat inför lanseringen.</p></details>
-      <details><summary>Är passarna kontrollerade?</summary><p>Inte än. Identifiering med BankID och utdrag ur belastningsregistret är planerat. Tills dess rekommenderar vi att du träffar passaren först och ber om referenser.</p></details>
-      <details><summary>Hur fungerar omdömen?</summary><p>När ett pass är markerat som genomfört kan du ge passaren ett betyg från 1 till 5 och skriva en kommentar. Passarens snittbetyg räknas om direkt.</p></details>
-      <details><summary>Var finns Passa?</summary><p>Du kan söka i hela Sverige. Avståndet räknas från din ort, så du ser vilka passare som bor närmast.</p></details>
-      <details><summary>Vad händer med det jag skriver i prototypen?</summary><p>Det sparas bara i din egen webbläsare. Ingen annan ser dina bokningar, meddelanden eller annonser, och du kan radera allt under Profil.</p></details>
+      <details><summary>Är hundvakterna kontrollerade?</summary><p>Inte än. Identifiering med BankID är planerad. Tills dess rekommenderar vi att du träffar hundvakten tillsammans med hunden innan första passet.</p></details>
+      <details><summary>Vad händer med det jag skriver i prototypen?</summary><p>Det sparas bara i din egen webbläsare. Ingen annan ser dina bokningar, uppdrag eller meddelanden, och du kan radera allt under Profil.</p></details>
     </div>
   </div>
 </section>
 
 <section class="final"><div class="in">
-  <div><h2>Hitta en passare i dag</h2><p>Prova appen, sök i din ort och se hur bokning och Swish-betalning fungerar.</p></div>
-  <div style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn green" href="app.html">Öppna appen</a><a class="btn line" href="app.html#annons">Bli passare</a></div>
+  <div><h2>Hitta en hundvakt i dag</h2><p>Prova appen, sök i din ort eller bläddra i uppdragskalendern.</p></div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn green" href="app.html">Öppna appen</a><a class="btn line" href="app.html#kalender">Se kalendern</a></div>
 </div></section>
 </main>
 
 <footer class="foot"><div class="in">
-  <div class="stack"><a class="logo" href="#top"><i aria-hidden="true"></i><b>Passa<span>.</span></b></a>
-    <p>Barn- och hundpassning nära dig. Passa är under utveckling, och prototypen hanterar inga riktiga konton eller betalningar.</p></div>
+  <div class="stack"><a class="logo" href="#top"><i aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="5.2" cy="11.3" rx="2" ry="2.5"/><ellipse cx="9" cy="6.6" rx="2" ry="2.6"/><ellipse cx="15" cy="6.6" rx="2" ry="2.6"/><ellipse cx="18.8" cy="11.3" rx="2" ry="2.5"/><path d="M12 11.5c-3.2 0-6.2 3.7-6.2 6.4 0 1.7 1.3 2.5 3 2.5 1.3 0 2.1-.7 3.2-.7s1.9.7 3.2.7c1.7 0 3-.8 3-2.5 0-2.7-3-6.4-6.2-6.4z"/></svg></i><b>Passa<span>.</span></b></a>
+    <p>Hundpassning nära dig. Passa är under utveckling, och prototypen hanterar inga riktiga konton eller betalningar.</p></div>
   <nav aria-label="Sidfot">
-    <a href="#sa-fungerar-det">Så fungerar det</a><a href="#betalning">Betalning</a><a href="#bli-passare">Bli passare</a><a href="#trygghet">Trygghet</a><a href="#fragor">Frågor</a><a href="app.html">Appen</a>
+    <a href="#tjanster">Tjänster</a><a href="#sa-fungerar-det">Så fungerar det</a><a href="#kalendern">Kalendern</a><a href="#betalning">Betalning</a><a href="#fragor">Frågor</a><a href="app.html">Appen</a>
   </nav>
 </div></footer>
 </body>
