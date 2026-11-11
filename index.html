@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Passa</title>
-<meta name="description" content="Passa hjälper hundägare att hitta en hundvakt nära sig för promenad, hunddagis och övernattning, och att betala med Swish.">
+<meta name="description" content="Passa hjälper hundägare att hitta en hundvakt nära sig för promenad, hunddagis och övernattning, och att betala med kort via Stripe.">
 <style>
 /* Layout: hundpassning. Grön hero med två telefoner, sedan omväxlande sektioner på krämvit botten. Innehåll max 1120px, telefonskärmar från den riktiga appen bär berättelsen */
 :root{
@@ -232,7 +232,7 @@ details p{padding:0 0 22px;color:var(--muted);max-width:62ch}
   <div class="copy">
     <span class="status-pill">Under utveckling · prova prototypen</span>
     <h1>En trygg hundvakt, <em>när du behöver det.</em></h1>
-    <p class="lead">Passa kopplar ihop hundägare med hundvakter i närheten. Boka en promenad, hunddagis eller övernattning, chatta i appen och betala med Swish när passet är klart.</p>
+    <p class="lead">Passa kopplar ihop hundägare med hundvakter i närheten. Boka en promenad, hunddagis eller övernattning, chatta i appen och betala tryggt med kort via Stripe.</p>
     <div class="ctas">
       <a class="btn orange" href="app.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Hitta en hundvakt</a>
@@ -262,8 +262,8 @@ details p{padding:0 0 22px;color:var(--muted);max-width:62ch}
       <span class="num">1</span><h3>Sök och jämför</h3><p class="muted">Välj tjänst, din ort och hur långt bort hundvakten får bo. Sortera på avstånd, pris eller betyg.</p></div>
     <div class="step"><div class="stage"><div class="phone sm"><img src="img/chat.webp" alt="Chatt i appen där en hundägare skriver till en hundvakt" width="585" height="1266" loading="lazy"></div></div>
       <span class="num">2</span><h3>Chatta och boka</h3><p class="muted">Ställ dina frågor först. Skicka sedan en förfrågan med datum och se direkt vad passet kostar.</p></div>
-    <div class="step"><div class="stage"><div class="phone sm"><img src="img/pay.webp" alt="Swish-betalning i appen med belopp och meddelande att kopiera" width="585" height="1266" loading="lazy"></div></div>
-      <span class="num">3</span><h3>Betala med Swish</h3><p class="muted">Efter passet swishar du hundvakten direkt. Belopp och meddelande står färdiga att kopiera.</p></div>
+    <div class="step"><div class="stage"><div class="phone sm"><img src="img/pay.webp" alt="Bokning i appen som är betald via Stripe, med länk till kvitto" width="585" height="1266" loading="lazy"></div></div>
+      <span class="num">3</span><h3>Betala med kort</h3><p class="muted">Du betalar i Stripes säkra kassa och får ett kvitto. Passa ser aldrig dina kortuppgifter.</p></div>
   </div>
   <div class="tip-row"><p><b>Hittar du ingen ledig hundvakt?</b> Lägg ut ett uppdrag med din hund och dina datum, så hör hundvakter i närheten av sig.</p><a class="btn green" href="app.html#nytt">Lägg ut ett uppdrag</a></div>
 </section>
@@ -277,7 +277,7 @@ details p{padding:0 0 22px;color:var(--muted);max-width:62ch}
         <li><div><b>Bläddra i kalendern</b><span>Varje dag visar hur många uppdrag som finns. Filtrera på ort, avstånd och tjänst.</span></div></li>
         <li><div><b>Läs om hunden</b><span>Ras, storlek, ålder, tider och vad hundägaren betalar står i uppdraget.</span></div></li>
         <li><div><b>Erbjud dig</b><span>Skicka ett meddelande direkt i appen. Hundägaren svarar under Meddelanden.</span></div></li>
-        <li><div><b>Få betalt med Swish</b><span>Lägg in ditt Swish-nummer i annonsen. Pengarna kommer direkt till dig efter passet.</span></div></li>
+        <li><div><b>Få betalt via Stripe</b><span>Koppla ditt bankkonto en gång med Stripe. Betalningar från hundägare betalas ut till dig automatiskt.</span></div></li>
       </ol>
       <div style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn orange" href="app.html#kalender">Öppna kalendern</a><a class="btn line" href="app.html#annons">Skapa annons</a></div>
     </div>
@@ -288,16 +288,16 @@ details p{padding:0 0 22px;color:var(--muted);max-width:62ch}
 <section class="in sec" id="betalning" aria-labelledby="h-pay">
   <div class="pay">
     <div class="pay-copy">
-      <span class="eyebrow">Betalning</span><h2 id="h-pay">Pengarna går direkt till hundvakten</h2>
-      <p class="lead">Du betalar när passet är klart. Appen räknar ut beloppet och ger varje bokning ett eget meddelande, så att hundvakten ser vilken betalning som hör till vilket pass.</p>
+      <span class="eyebrow">Betalning</span><h2 id="h-pay">Kortbetalning via Stripe, utbetalning till hundvakten</h2>
+      <p class="lead">Hundägaren betalar med kort i Stripes kassa. Pengarna förs över till hundvaktens Stripe-konto och betalas ut till hundvaktens bankkonto. Passa hanterar aldrig kortuppgifter.</p>
       <ol class="track" aria-label="Betalningens steg">
-        <li><span class="dot"></span><b>Ej betald</b><span>Passet är bokat eller klart</span></li>
-        <li><span class="dot"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg></span><b>Swishad</b><span>Du har betalat och markerat det</span></li>
-        <li><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><b>Betald</b><span>Hundvakten har fått pengarna</span></li>
+        <li><span class="dot"></span><b>Bokad</b><span>Förfrågan skickad till hundvakten</span></li>
+        <li><span class="dot"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg></span><b>Betald</b><span>Hundägaren betalar med kort och får kvitto</span></li>
+        <li><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><b>Utbetald</b><span>Stripe betalar ut till hundvaktens bankkonto</span></li>
       </ol>
       <div class="methods">
-        <div class="method"><span class="sw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg></span><div><b>Swish</b><span>Finns i appen nu</span></div></div>
-        <div class="method soon"><span class="sw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg></span><div><b>Klarna</b><span>Faktura och delbetalning, planerat</span></div></div>
+        <div class="method"><span class="sw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg></span><div><b>Kort</b><span>Visa, Mastercard med flera via Stripe</span></div></div>
+        <div class="method"><span class="sw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 7v5c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V7z"/><path d="m9 12 2 2 4-4"/></svg></span><div><b>Stripe Connect</b><span>Hundvakten kopplar sitt konto en gång</span></div></div>
       </div>
     </div>
     <div class="calc" aria-label="Räkneexempel">
@@ -305,9 +305,9 @@ details p{padding:0 0 22px;color:var(--muted);max-width:62ch}
       <div class="row"><span>Övernattning för Bamse, labrador</span><span>2 nätter</span></div>
       <div class="row"><span>Pris per natt</span><span>450 kr</span></div>
       <hr>
-      <div class="row"><span class="muted">Att swisha</span><span class="sum">900 kr</span></div>
-      <div class="row small"><span class="muted">Meddelande i Swish</span><code>PASSA AB12CD3</code></div>
-      <p class="muted small">Passa tar inte emot eller håller några pengar. Betalningen går från din Swish till hundvaktens.</p>
+      <div class="row"><span class="muted">Att betala med kort</span><span class="sum">900 kr</span></div>
+      <div class="row small"><span class="muted">Betalas ut till</span><span>Hundvaktens bankkonto via Stripe</span></div>
+      <p class="muted small">Stripe tar en avgift per kortbetalning enligt sin prislista. Utbetalningen sker enligt Stripes utbetalningsschema.</p>
     </div>
   </div>
 </section>
@@ -320,12 +320,12 @@ details p{padding:0 0 22px;color:var(--muted);max-width:62ch}
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Omdömen kan bara lämnas efter ett genomfört pass</li>
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Chatta innan du bokar eller tackar ja</li>
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Priset och kostnaden syns innan du bokar</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Passa hanterar inga pengar</li></ul></div>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Kortuppgifter skrivs bara in hos Stripe, aldrig hos Passa</li></ul></div>
     <div class="plan"><span class="label">Planerat inför lansering</span><h3>Det vi bygger härnäst</h3><ul>
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/></svg>Inloggning och identifiering med BankID</li>
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/></svg>Konton och uppdrag som delas mellan alla användare</li>
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/></svg>Påminnelser när någon svarar eller bokar</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/></svg>Betalning med Klarna</li></ul></div>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/></svg>Fler betalsätt i Stripes kassa</li></ul></div>
     <div class="tips"><span class="label">Våra tips</span><h3>Innan första passet</h3><ul>
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Träffas en kort stund innan, tillsammans med hunden</li>
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Gå igenom mat, mediciner, rutiner och veterinärens nummer</li>
@@ -342,8 +342,8 @@ details p{padding:0 0 22px;color:var(--muted);max-width:62ch}
       <details><summary>Vad kostar en hundvakt?</summary><p>Varje hundvakt sätter sina egna priser: per timme för promenad, per dag för hunddagis och per natt för övernattning. När du bokar räknar appen ut totalen innan du skickar förfrågan.</p></details>
       <details><summary>Hur fungerar uppdragskalendern?</summary><p>Hundägare lägger ut uppdrag med datum, hund och ersättning. I kalendern ser hundvakter hur många uppdrag som finns varje dag, ett år framåt. Välj en dag för att se uppdragen och erbjud dig direkt.</p></details>
       <details><summary>Hur lägger jag ut ett uppdrag?</summary><p>Tryck på Lägg ut uppdrag i appen. Fyll i hundens namn, ras och storlek, vilken tjänst och vilka datum det gäller, och vad du betalar. Appen föreslår ett belopp som du kan ändra.</p></details>
-      <details><summary>Hur betalar jag?</summary><p>Med Swish, efter passet. Under Bokningar trycker du på Betala med Swish. Där står hundvaktens nummer, beloppet och ett meddelande som du kopierar in i Swish-appen.</p></details>
-      <details><summary>Kan jag betala med Klarna?</summary><p>Inte än. Klarna kräver ett avtal mellan Passa och Klarna, och det är planerat inför lanseringen.</p></details>
+      <details><summary>Hur betalar jag?</summary><p>Med kort. Under Bokningar trycker du på Betala med kort. Du kommer till Stripes säkra kassa, och när betalningen är klar får du ett kvitto och bokningen markeras som betald.</p></details>
+      <details><summary>Hur får jag betalt som hundvakt?</summary><p>Du kopplar ett Stripe-konto från din annons. Hos Stripe fyller du i dina uppgifter och ditt bankkonto. Därefter betalas hundägarnas betalningar ut till dig enligt Stripes utbetalningsschema.</p></details>
       <details><summary>Är hundvakterna kontrollerade?</summary><p>Inte än. Identifiering med BankID är planerad. Tills dess rekommenderar vi att du träffar hundvakten tillsammans med hunden innan första passet.</p></details>
       <details><summary>Vad händer med det jag skriver i prototypen?</summary><p>Det sparas bara i din egen webbläsare. Ingen annan ser dina bokningar, uppdrag eller meddelanden, och du kan radera allt under Profil.</p></details>
     </div>

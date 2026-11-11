@@ -1,0 +1,9 @@
+{
+  "name": "passa",
+  "private": true,
+  "description": "Passa – hundpassning nära dig. Hemsida, app och serverfunktioner för Stripe Connect.",
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "stripe": "^17.0.0"
+  }
+}

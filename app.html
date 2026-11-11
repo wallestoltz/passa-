@@ -123,11 +123,11 @@ legend{font-weight:650;font-size:.88rem;margin-bottom:8px;padding:0}
 .chip.o{background:var(--orange-soft);color:var(--orange-ink)}
 .chip.ex{background:var(--surface-2);color:var(--muted);border:1px dashed var(--line-2)}
 .chip.ok{background:var(--ok-soft);color:var(--ok)}
-.status{font-size:.75rem;font-weight:750;padding:3px 10px;border-radius:99px;white-space:nowrap}
-.status.req{background:var(--orange-soft);color:var(--orange-ink)}
-.status.done{background:var(--ok-soft);color:var(--ok)}
-.status.cancel{background:var(--surface-2);color:var(--muted)}
-.status.paid{background:var(--green-soft);color:var(--green)}
+.status{font-size:.75rem;font-weight:750;padding:3px 10px;border-radius:99px;white-space:nowrap;flex:none;align-self:center;line-height:1.5}
+.status.st-req{background:var(--orange-soft);color:var(--orange-ink)}
+.status.st-done{background:var(--ok-soft);color:var(--ok)}
+.status.st-cancel{background:var(--surface-2);color:var(--muted)}
+.status.st-paid{background:var(--green-soft);color:var(--green)}
 .note{background:var(--orange-soft);color:var(--orange-ink);border-radius:12px;padding:12px 14px;font-size:.88rem}
 .empty{text-align:center;padding:36px 20px;display:flex;flex-direction:column;align-items:center;gap:10px}
 .empty .ill{width:56px;height:56px;border-radius:16px;background:var(--surface-2);color:var(--muted);display:grid;place-items:center}
@@ -258,6 +258,8 @@ hr{border:0;border-top:1px solid var(--line);margin:2px 0;width:100%}
 .payopt:has(input:checked){border-color:var(--green);background:var(--green-soft)}
 .payopt.off{opacity:.6;cursor:not-allowed}
 .payopt b{display:block}
+.pm-ico{width:38px;height:38px;border-radius:11px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;flex:none}
+.pm-ico svg{width:20px;height:20px}
 .copyrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--line)}
 .copyrow > div{min-width:0}
 .copyrow code{font:700 1.08rem/1.2 var(--mono);font-variant-numeric:tabular-nums;user-select:all;overflow-wrap:anywhere}
@@ -310,16 +312,71 @@ function toast(t){ const el=$("#toast"); el.textContent=t; el.hidden=false; clea
 function hash(str){ let h=2166136261; for(const ch of str){ h^=ch.charCodeAt(0); h=Math.imul(h,16777619); } return h>>>0; }
 function rng(seed){ return ()=>{ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
 
-/* Swish */
-const cleanSwish = v => { let d=String(v||"").replace(/\D/g,""); if(d.startsWith("46")) d="0"+d.slice(2); return d; };
-const validSwish = v => /^07[02369]\d{7}$/.test(cleanSwish(v));
-const fmtSwish = v => { const d=cleanSwish(v); return d.length===10? `${d.slice(0,3)}-${d.slice(3,6)} ${d.slice(6,8)} ${d.slice(8)}` : d; };
-const payRef = b => "PASSA " + b.id.toUpperCase().slice(0,7);
-function copyText(text, btn){
-  const done=()=>{ const o=btn.textContent; btn.textContent="Kopierat"; setTimeout(()=>btn.textContent=o,1500); };
-  try { navigator.clipboard.writeText(text).then(done).catch(()=>selectNear(btn)); } catch(e){ selectNear(btn); }
+/* ---------- Betalning via Stripe Connect ----------
+   Appen pratar med serverfunktionerna i mappen api/. Utan server (till exempel på GitHub Pages)
+   visar appen att kortbetalning inte är påslagen. Kortuppgifter samlas aldrig in här, de skrivs bara in hos Stripe. */
+const API="api/";
+const PAY={checked:false,ok:false,mode:"",fee:0};
+async function api(path,opts={}){
+  const res=await fetch(API+path,{headers:{"Content-Type":"application/json"},...opts});
+  let data={}; try{ data=await res.json(); }catch(e){}
+  if(!res.ok) throw new Error(data.error||("Servern svarade med fel "+res.status));
+  return data;
 }
-function selectNear(btn){ const c=btn.parentElement.querySelector("code"); if(!c) return; const r=document.createRange(); r.selectNodeContents(c); const s=getSelection(); s.removeAllRanges(); s.addRange(r); toast("Markerat. Kopiera med Ctrl+C eller håll in."); }
+async function checkPay(){
+  if(PAY.checked) return PAY;
+  try{ const h=await api("health"); PAY.ok=!!h.stripe; PAY.mode=h.mode||""; PAY.fee=+h.feePercent||0; }catch(e){ PAY.ok=false; }
+  PAY.checked=true; return PAY;
+}
+const appUrl=(query,hash)=>location.origin+location.pathname+(query?"?"+query:"")+(hash?"#"+hash:"");
+const PAY_OFF_MSG="Kortbetalning är inte påslagen här. Appen behöver köras tillsammans med Passas server och en Stripe-nyckel, se README-filen.";
+function stripeLabel(s){ if(s.example) return "Exempelprofil"; if(s.stripeReady) return "Kopplat"; if(s.stripeAccount) return "Inte klart"; return "Inte kopplat"; }
+async function refreshStripe(s){
+  if(!s||!s.stripeAccount) return;
+  try{ const d=await api("connect-status?account="+encodeURIComponent(s.stripeAccount)); s.stripeReady=!!d.chargesEnabled; s.stripePayouts=!!d.payoutsEnabled; save(); }catch(e){}
+}
+async function connectStripe(s,btn){
+  await checkPay(); if(!PAY.ok){ toast(PAY_OFF_MSG); return; }
+  const label=btn.innerHTML; btn.disabled=true; btn.textContent="Öppnar Stripe…";
+  try{
+    const d=await api("connect-onboard",{method:"POST",body:JSON.stringify({accountId:s.stripeAccount||null,returnUrl:appUrl("stripe=klar&sitter="+s.id,"hundvakt-"+s.id),refreshUrl:appUrl("stripe=igen&sitter="+s.id,"hundvakt-"+s.id)})});
+    s.stripeAccount=d.accountId; save(); location.href=d.url;
+  }catch(e){ btn.disabled=false; btn.innerHTML=label; toast("Det gick inte att öppna Stripe. "+e.message); }
+}
+async function payWithStripe(b,btn){
+  const s=getSitter(b.sitterId);
+  await checkPay();
+  if(!PAY.ok){ payNote(b,PAY_OFF_MSG); return; }
+  if(!s||!s.stripeAccount||!s.stripeReady){ payNote(b, s&&s.example?"Exempelprofiler har inget Stripe-konto och går inte att betala. Skapa en egen annons och koppla Stripe för att testa hela flödet.":"Hundvakten har inte kopplat Stripe än. Skriv till hundvakten och be hen koppla sitt konto under sin annons."); return; }
+  const label=btn.innerHTML; btn.disabled=true; btn.textContent="Öppnar Stripe…";
+  try{
+    const d=await api("checkout",{method:"POST",body:JSON.stringify({bookingId:b.id,amount:Math.round(b.total),description:`${SVC[b.service].label} för ${b.dog||"hunden"} hos ${s.name}`,destination:s.stripeAccount,successUrl:appUrl("betalning=klar&booking="+b.id+"&session_id={CHECKOUT_SESSION_ID}","bokningar"),cancelUrl:appUrl("betalning=avbruten&booking="+b.id,"bokningar")})});
+    b.checkoutSession=d.id; save(); location.href=d.url;
+  }catch(e){ btn.disabled=false; btn.innerHTML=label; payNote(b,"Det gick inte att starta betalningen. "+e.message); }
+}
+function payNote(b,msg){
+  const box=document.getElementById("rv-"+b.id); if(!box) return;
+  box.innerHTML=`<div class="paybox"><p class="small">${esc(msg)}</p><button type="button" class="btn ghost sm" style="align-self:flex-start">Stäng</button></div>`;
+  box.querySelector("button").onclick=()=>{box.innerHTML="";};
+}
+async function handleReturn(){
+  const q=new URLSearchParams(location.search); if(!q.toString()) return;
+  history.replaceState(null,"",location.pathname+location.hash);
+  if(q.get("stripe")){
+    const s=getSitter(q.get("sitter")); if(!s) return;
+    if(q.get("stripe")==="igen"){ toast("Länken till Stripe gick ut. Tryck på Slutför kopplingen igen."); return; }
+    await refreshStripe(s); toast(s.stripeReady?"Stripe är kopplat. Du kan ta emot kortbetalningar.":"Kopplingen är inte klar än. Slutför stegen hos Stripe."); render(); return;
+  }
+  if(q.get("betalning")){
+    const b=S.bookings.find(x=>x.id===q.get("booking")); if(!b) return;
+    if(q.get("betalning")==="avbruten"){ toast("Betalningen avbröts. Inga pengar har dragits."); return; }
+    try{
+      const d=await api("checkout-status?session_id="+encodeURIComponent(q.get("session_id")||""));
+      if(d.paid&&d.bookingId===b.id){ b.pay="betald"; b.paidAt=Date.now(); b.receipt=d.receiptUrl||""; save(); toast("Betalningen är klar"); render(); }
+      else toast("Betalningen är inte bekräftad än. Ladda om sidan om en stund.");
+    }catch(e){ toast("Kunde inte kontrollera betalningen. "+e.message); }
+  }
+}
 
 /* ---------- Ikoner ---------- */
 const sv = (p,f) => `<svg viewBox="0 0 24 24" ${f?'fill="currentColor"':'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'} aria-hidden="true">${p}</svg>`;
@@ -369,7 +426,7 @@ const SEED_SITTERS = [
  {id:"s6",name:"Linnea Holm",city:"Stockholm",off:[.01,-.02],services:["promenad"],prices:{promenad:190},sizes:["liten","mellan"],home:"Lägenhet på Södermalm",bio:"Lunchpromenader i Tantolunden på vardagar, max två hundar åt gången.",exp:"4 år som hundrastare",lang:"Svenska, franska"},
  {id:"s7",name:"Ali Rahimi",city:"Göteborg",off:[-.01,.01],services:["promenad","dagis"],prices:{promenad:150,dagis:350},sizes:["mellan","stor"],home:"Lägenhet nära Slottsskogen",bio:"Promenader i Slottsskogen, max tre hundar åt gången. Tränar gärna inkallning.",exp:"2 år som hundrastare",lang:"Svenska, dari, engelska"},
  {id:"s8",name:"Maja Strand",city:"Uppsala",off:[0,.01],services:["promenad","natt"],prices:{promenad:160,natt:430},sizes:["liten","mellan","stor"],home:"Villa med trädgård",bio:"Psykologstudent som vuxit upp med hundar. Hemma de flesta kvällar och helger.",exp:"Uppvuxen med hund",lang:"Svenska, engelska"}
-].map(s=>({...s,example:true,lat:CITIES[s.city][0]+s.off[0],lng:CITIES[s.city][1]+s.off[1],photo:null,swish:""}));
+].map(s=>({...s,example:true,lat:CITIES[s.city][0]+s.off[0],lng:CITIES[s.city][1]+s.off[1],photo:null,stripeAccount:"",stripeReady:false}));
 
 /* ---------- Exempeluppdrag. Varje datum ger alltid samma uppdrag ---------- */
 const OWNERS = ["Karin B.","Mikael S.","Lena H.","Ahmed K.","Frida N.","Per L.","Sofia W.","Jonas E.","Hanna M.","Daniel Ö.","Ingrid A.","Elias R.","Maria J.","Viktor P."];
@@ -459,7 +516,7 @@ function render(){
   const key=views[route]?route:"start";
   renderNav(key);
   const narrow=["boka","nytt","bokningar","meddelanden","chatt","annons","profil"].includes(key);
-  $("#app").innerHTML=`<div class="page${narrow?" narrow":""}">${views[key](arg)}</div><footer class="foot"><div class="in"><span><b style="color:var(--ink)">Passa</b> · Hundpassning nära dig · Prototyp</span><span>Betalning med Swish direkt mellan hundägare och hundvakt</span></div></footer>`;
+  $("#app").innerHTML=`<div class="page${narrow?" narrow":""}">${views[key](arg)}</div><footer class="foot"><div class="in"><span><b style="color:var(--ink)">Passa</b> · Hundpassning nära dig · Prototyp</span><span>Kortbetalning via Stripe</span></div></footer>`;
   document.title={start:"Passa",sok:"Hitta hundvakt · Passa",kalender:"Uppdragskalender · Passa",nytt:"Lägg ut uppdrag · Passa",bokningar:"Bokningar · Passa",meddelanden:"Meddelanden · Passa",profil:"Profil · Passa",annons:"Bli hundvakt · Passa"}[key]||"Passa";
   (after[key]||(()=>{}))(arg);
 }
@@ -497,7 +554,7 @@ function start(){
   return `<section class="hero">
     <div style="min-width:0"><p class="eyebrow">Hundpassning nära dig</p>
       <h1>En trygg hundvakt, <em>när du behöver det.</em></h1>
-      <p class="lead">Hitta någon som går promenaden, tar hunden på dagis eller har den hemma över natten. Betala med Swish när passet är klart.</p>
+      <p class="lead">Hitta någon som går promenaden, tar hunden på dagis eller har den hemma över natten. Betala tryggt med kort via Stripe.</p>
       <div class="facts"><div><b>${nearCount}</b><span>hundvakter nära ${esc(city)}</span></div><div><b>${week}</b><span>uppdrag kommande 7 dagar</span></div><div><b>3</b><span>sorters passning</span></div></div></div>
     <form id="searchForm" class="sbox"><h2 style="font-size:1.3rem">Hitta en hundvakt</h2>
       <fieldset><legend>Vad behöver hunden?</legend><div class="seg" role="group">${svcSeg("data-svc",s.service)}</div></fieldset>
@@ -555,10 +612,17 @@ function hundvakt(id){
   </div>
   <aside class="card pad-lg stack" style="gap:16px"><div class="plist">${s.services.map(k=>`<div><span>${I[SVC[k].icon]}${SVC[k].label}</span><b class="num">${kr(s.prices[k])} <span class="muted small" style="font-weight:500">/ ${SVC[k].unit}</span></b></div>`).join("")}</div>
    <a class="btn orange block" href="#boka-${esc(s.id)}">Boka ${first}</a><a class="btn ghost block" href="#chatt-${esc(s.id)}">${I.chat} Skriv till ${first}</a><hr>
-   <div class="plist small"><b>Betalning</b><div><span>${I.phone}Swish</span><span class="muted">${s.swish?esc(fmtSwish(s.swish)):s.example?"Exempelprofil":"Nummer saknas"}</span></div><div><span>${I.card}Klarna</span><span class="muted">Kommer senare</span></div></div>
-   <p class="muted xs">Du betalar direkt till ${first} efter passet.</p></aside>
+   <div class="plist small"><b>Betalning</b><div><span>${I.card}Kort via Stripe</span><span class="muted">${stripeLabel(s)}</span></div></div>
+   <p class="muted xs">Du betalar i Stripes kassa. Passa ser aldrig dina kortuppgifter.</p>
+   ${!s.example?`<div class="paybox"><b>Dina utbetalningar</b><p class="small muted">${s.stripeReady?"Stripe är kopplat. Betalningar från hundägare betalas ut till ditt bankkonto enligt Stripes utbetalningsschema.":s.stripeAccount?"Du har påbörjat kopplingen men inte slutfört den hos Stripe.":"Koppla ett Stripe-konto så att hundägare kan betala dig med kort. Du fyller i dina uppgifter och ditt bankkonto hos Stripe."}</p><button type="button" class="btn ${s.stripeReady?"ghost":"orange"} sm" id="stripeBtn" style="align-self:flex-start">${I.card} ${s.stripeReady?"Öppna Stripe igen":s.stripeAccount?"Slutför kopplingen":"Koppla Stripe"}</button></div>`:""}</aside>
   </div></div>`;
 }
+
+after.hundvakt=id=>{
+  const s=getSitter(id); if(!s||s.example) return;
+  const b=$("#stripeBtn"); if(b) b.onclick=()=>connectStripe(s,b);
+  if(s.stripeAccount&&!s.stripeReady) refreshStripe(s).then(()=>{ if(s.stripeReady) render(); });
+};
 
 /* ---------- Boka ---------- */
 function boka(id){
@@ -576,9 +640,8 @@ function boka(id){
     <label for="b-hours" id="wrap-hours">Antal timmar<input id="b-hours" type="number" min="0.5" max="12" step="0.5" value="1"></label>
     <label for="b-note">Bra att veta<textarea id="b-note" maxlength="600" placeholder="Ras, ålder, mat, mediciner, hur hunden fungerar med andra hundar…"></textarea></label>
     <div class="paybox"><div class="sumrow"><span class="muted" id="b-units"></span><b id="b-sum"></b></div></div>
-    <fieldset class="stack" style="gap:8px"><legend>Hur vill du betala?</legend>
-     <label class="payopt" for="pm-swish"><input type="radio" name="pm" id="pm-swish" value="swish" checked><span><b>Swish</b><span class="muted small">Du swishar efter passet. Du får nummer, belopp och meddelande att kopiera.</span></span></label>
-     <label class="payopt off" for="pm-klarna"><input type="radio" name="pm" id="pm-klarna" value="klarna" disabled><span><b>Klarna</b><span class="muted small">Faktura eller delbetalning. Kommer när Passa har ett avtal med Klarna.</span></span></label></fieldset>
+    <div class="stack" style="gap:8px"><span class="lbl">Betalning</span>
+     <div class="payopt" style="cursor:default"><span class="pm-ico">${I.card}</span><span><b>Kort via Stripe</b><span class="muted small">När förfrågan är skickad betalar du under Bokningar, i Stripes säkra kassa. Passa ser aldrig dina kortuppgifter.</span></span></div></div>
     <button class="btn orange" type="submit">${I.send} Skicka förfrågan</button>
    </form></div>`;
 }
@@ -679,7 +742,7 @@ function uppdrag(id){
     <dl class="facts"><div><dt>När</dt><dd>${esc(reqWhen(r))}</dd></div><div><dt>Hund</dt><dd>${esc(r.dog.breed)}, ${esc(r.dog.age)}</dd></div><div><dt>Storlek</dt><dd>${esc(SIZES[r.dog.size]||"")}</dd></div><div><dt>Hundägare</dt><dd>${esc(r.owner)}</dd></div></dl></div>
   </div>
   <aside class="card pad-lg stack" style="gap:16px">
-   <div><span class="bigprice">${kr(r.pay)}</span><p class="muted small" style="margin-top:6px">Ersättning för ${unitLabel(r.service,unitsN)}, betalas med Swish efter passet</p></div>
+   <div><span class="bigprice">${kr(r.pay)}</span><p class="muted small" style="margin-top:6px">Ersättning för ${unitLabel(r.service,unitsN)}, betalas med kort via Stripe</p></div>
    ${r.mine?`<p class="small muted">Hundvakter som erbjuder sig hör av sig under Meddelanden.</p><button class="btn ghost block" id="delReq">Ta bort uppdraget</button>`
      : past?`<p class="muted small">Uppdraget har passerat.</p>`
      : offered?`<p class="small">Du har erbjudit dig. ${esc(r.owner.split(" ")[0])} svarar i Meddelanden.</p><a class="btn ghost block" href="#chatt-o${esc(r.id)}">${I.chat} Öppna konversationen</a>`
@@ -742,18 +805,18 @@ let bookTab="kommande";
 function bokningar(){
   const t=today(), isPast=b=>b.status!=="forfragan"||b.to<t;
   const list=S.bookings.filter(b=>bookTab==="kommande"?!isPast(b):isPast(b)).sort((a,b)=>bookTab==="kommande"?a.from.localeCompare(b.from):b.from.localeCompare(a.from));
-  const label={forfragan:["Förfrågan skickad","req"],genomford:["Genomförd","done"],avbokad:["Avbokad","cancel"]};
-  const payL={obetald:["Ej betald","req"],betald:["Swishad, väntar på bekräftelse","paid"],bekraftad:["Betald","done"]};
+  const label={forfragan:["Förfrågan skickad","st-req"],genomford:["Genomförd","st-done"],avbokad:["Avbokad","st-cancel"]};
+  const payL={obetald:["Ej betald","st-req"],betald:["Betald via Stripe","st-done"],bekraftad:["Betald","st-done"]};
   return `<div class="phead"><span class="eyebrow">Som hundägare</span><h1>Bokningar</h1></div>
    <div class="seg" role="group" aria-label="Visa" style="margin-bottom:16px">${[["kommande","Kommande"],["tidigare","Tidigare"]].map(([v,l])=>`<button type="button" data-tab="${v}" aria-pressed="${bookTab===v}">${l}</button>`).join("")}</div>
    ${list.length?`<div class="stack" style="gap:12px">${list.map(b=>{const s=getSitter(b.sitterId)||{name:"Borttagen hundvakt",id:""}; const reviewed=S.reviews.some(r=>r.bookingId===b.id); const [lt,lc]=label[b.status]||label.forfragan; const [pt,pc]=payL[b.pay]||payL.obetald; const overdue=b.status==="forfragan"&&b.to<t;
-    return `<article class="card stack" style="gap:12px"><div class="row between" style="flex-wrap:nowrap"><div class="row" style="gap:12px;flex-wrap:nowrap;min-width:0">${avatar(s,"sm")}<div style="min-width:0"><h3 class="trunc">${esc(s.name)}</h3><p class="muted small trunc">${SVC[b.service].label} · ${esc(b.dog)}</p></div></div><span class="status ${lc}">${lt}</span></div>
+    return `<article class="card stack" style="gap:12px"><div class="row between" style="flex-wrap:nowrap"><div class="row" style="gap:12px;flex-wrap:nowrap;min-width:0;flex:1">${avatar(s,"sm")}<div style="min-width:0"><h3 class="trunc">${esc(s.name)}</h3><p class="muted small trunc">${SVC[b.service].label} · ${esc(b.dog)}</p></div></div><span class="status ${lc}">${lt}</span></div>
      <div class="row between small num"><span>${esc(bookingWhen(b))}</span><b>${kr(b.total)}</b></div>
      ${b.status!=="avbokad"?`<div class="row small"><span class="muted">Betalning</span><span class="status ${pc}">${pt}</span></div>`:""}
      <div class="row">
-      ${b.status!=="avbokad"&&(b.pay||"obetald")==="obetald"?`<button class="btn sm ${b.status==="genomford"?"orange":""}" data-act="pay" data-id="${b.id}">${I.phone} Betala med Swish</button>`:""}
-      ${b.pay==="betald"&&s.id&&!s.example?`<button class="btn sm" data-act="confirm" data-id="${b.id}">Bekräfta mottagen betalning</button>`:""}
-      ${b.status==="forfragan"?`${overdue?`<button class="btn sm" data-act="done" data-id="${b.id}">Markera som genomförd</button>`:""}<button class="btn sm ghost" data-act="cancel" data-id="${b.id}">Avboka</button>`:""}
+      ${b.status!=="avbokad"&&(b.pay||"obetald")==="obetald"?`<button class="btn sm orange" data-act="pay" data-id="${b.id}">${I.card} Betala med kort</button>`:""}
+      ${b.receipt&&/^https:\/\//.test(b.receipt)?`<a class="btn sm ghost" href="${esc(b.receipt)}" target="_blank" rel="noopener">Kvitto</a>`:""}
+      ${b.status==="forfragan"?`${overdue?`<button class="btn sm" data-act="done" data-id="${b.id}">Markera som genomförd</button>`:""}${b.pay!=="betald"?`<button class="btn sm ghost" data-act="cancel" data-id="${b.id}">Avboka</button>`:""}`:""}
       ${b.status==="genomford"&&!reviewed?`<button class="btn sm orange" data-act="review" data-id="${b.id}">Lämna omdöme</button>`:""}
       ${b.status==="genomford"&&reviewed?`<span class="muted small">Omdöme lämnat</span>`:""}
       ${s.id?`<a class="btn sm ghost" href="#chatt-${esc(s.id)}">Meddelande</a>`:""}
@@ -768,29 +831,10 @@ after.bokningar=()=>{
     const a=btn.dataset.act;
     if(a==="cancel"){ b.status="avbokad"; save(); toast("Bokningen är avbokad"); render(); }
     if(a==="done"){ b.status="genomford"; save(); bookTab="tidigare"; toast("Markerad som genomförd"); render(); }
-    if(a==="confirm"){ b.pay="bekraftad"; save(); toast("Betalningen är bekräftad"); render(); }
     if(a==="review") reviewForm(b);
-    if(a==="pay") payForm(b);
+    if(a==="pay") payWithStripe(b,btn);
   });
 };
-function payForm(b){
-  const s=getSitter(b.sitterId); if(!s) return;
-  const box=$("#rv-"+b.id), ref=payRef(b), hasNr=s.swish&&validSwish(s.swish);
-  box.innerHTML=`<div class="paybox"><b>Betala ${esc(s.name.split(" ")[0])} med Swish</b>
-   ${hasNr?"":`<p class="note small">${s.example?"Exempelprofilen har inget riktigt Swish-nummer. Du kan testa flödet, men swisha inte några pengar.":"Hundvakten har inte lagt in något Swish-nummer. Fråga efter det i meddelanden."}</p>`}
-   ${hasNr?`<div class="copyrow"><div><span class="muted xs">Swish-nummer</span><br><code>${esc(fmtSwish(s.swish))}</code></div><button type="button" class="btn sm ghost" data-copy="${esc(cleanSwish(s.swish))}">Kopiera</button></div>`:""}
-   <div class="copyrow"><div><span class="muted xs">Belopp</span><br><code>${Math.round(b.total)} kr</code></div><button type="button" class="btn sm ghost" data-copy="${Math.round(b.total)}">Kopiera</button></div>
-   <div class="copyrow"><div><span class="muted xs">Meddelande</span><br><code>${esc(ref)}</code></div><button type="button" class="btn sm ghost" data-copy="${esc(ref)}">Kopiera</button></div>
-   <ol class="steps small"><li>Öppna Swish-appen och välj Betala.</li><li>Fyll i numret, beloppet och meddelandet ovan.</li><li>Godkänn med BankID i Swish och kom sedan tillbaka hit.</li></ol>
-   <div class="row"><button type="button" class="btn orange sm" id="paid-${b.id}">Jag har swishat ${kr(b.total)}</button><button type="button" class="btn ghost sm" id="pc-${b.id}">Avbryt</button></div>
-   <p class="muted xs">Passa tar inte emot några pengar. Betalningen går direkt mellan er.</p></div>`;
-  box.querySelectorAll("[data-copy]").forEach(x=>x.onclick=()=>copyText(x.dataset.copy,x));
-  $("#pc-"+b.id).onclick=()=>{box.innerHTML="";};
-  $("#paid-"+b.id).onclick=()=>{ b.pay=s.example?"bekraftad":"betald"; b.paidAt=Date.now();
-    S.messages.push({id:uid(),cid:s.id,mine:true,read:true,ts:Date.now(),text:`Jag har swishat ${kr(b.total)} med meddelandet ${ref}.`});
-    save(); toast(s.example?"Testbetalning markerad som klar":"Markerad som swishad. Hundvakten bekräftar när pengarna kommit."); render(); };
-  box.scrollIntoView({behavior:"smooth",block:"nearest"});
-}
 function reviewForm(b){
   const box=$("#rv-"+b.id); let stars=0;
   box.innerHTML=`<form class="paybox"><b>Hur gick det?</b><div class="rate" role="group" aria-label="Betyg">${[1,2,3,4,5].map(n=>`<button type="button" data-n="${n}" aria-label="${n} av 5">★</button>`).join("")}</div>
@@ -829,7 +873,7 @@ after.chatt=cid=>{
 let pendingPhoto=null;
 function annons(){
   return `<div class="stack">${backBtn()}
-  <div class="phead" style="margin:0"><span class="eyebrow">Bli hundvakt</span><h1>Skapa din annons</h1><p>Hundägare i närheten hittar dig i sökningen. Du sätter dina egna priser och får betalt med Swish.</p></div>
+  <div class="phead" style="margin:0"><span class="eyebrow">Bli hundvakt</span><h1>Skapa din annons</h1><p>Hundägare i närheten hittar dig i sökningen. Du sätter dina egna priser och får betalt med kort via Stripe.</p></div>
   ${S.sitters.length?`<div class="stack" style="gap:8px"><h3>Dina annonser</h3>${S.sitters.map(s=>`<div class="lrow" style="cursor:default">${avatar(s,"sm")}<div class="grow"><b>${esc(s.name)}</b><p class="muted xs">${esc(s.city)} · ${s.services.map(k=>SVC[k].label).join(", ")}</p></div><a class="btn sm ghost" href="#hundvakt-${esc(s.id)}">Visa</a><button class="btn sm ghost" data-del="${esc(s.id)}">Ta bort</button></div>`).join("")}</div>`:""}
   <form id="adForm" class="card pad-lg stack">
    <div class="row" style="gap:16px"><div id="photoPrev">${avatar({name:S.me.name||"Ny hundvakt",photo:pendingPhoto},"lg")}</div><label for="a-photo" class="grow" style="min-width:200px">Profilbild (valfri)<input id="a-photo" type="file" accept="image/*"></label></div>
@@ -841,8 +885,7 @@ function annons(){
    <label for="a-home">Boende<input id="a-home" maxlength="80" placeholder="t.ex. Villa med inhägnad trädgård"></label>
    <label for="a-bio">Om dig<textarea id="a-bio" required maxlength="600" placeholder="Din erfarenhet av hundar, hur en dag med dig ser ut, när du kan…"></textarea></label>
    <div class="grid2"><label for="a-exp">Erfarenhet<input id="a-exp" maxlength="80" placeholder="t.ex. Egen hund i 5 år"></label><label for="a-lang">Språk<input id="a-lang" maxlength="80" placeholder="t.ex. Svenska, engelska"></label></div>
-   <label for="a-swish">Swish-nummer<input id="a-swish" inputmode="tel" maxlength="16" placeholder="070-123 45 67"><span class="hint">Hundägare swishar dig direkt efter passet.</span></label>
-   <p class="note small">Annonsen visas bara i den här webbläsaren. Identitetskontroll finns inte än, så annonsen märks inte som verifierad.</p>
+   <p class="note small">När annonsen är publicerad kopplar du Stripe på din profil för att kunna ta emot kortbetalningar. Annonsen visas bara i den här webbläsaren, och identitetskontroll finns inte än.</p>
    <button class="btn orange" type="submit">Publicera annons</button>
   </form></div>`;
 }
@@ -853,10 +896,9 @@ after.annons=()=>{
   $("#adForm").onsubmit=e=>{ e.preventDefault();
     const services=Object.keys(SVC).filter(k=>$("#a-s-"+k).checked), sizes=Object.keys(SIZES).filter(k=>$("#a-z-"+k).checked);
     if(!services.length){toast("Välj minst en tjänst");return;} if(!sizes.length){toast("Välj minst en hundstorlek");return;}
-    const sw=$("#a-swish").value.trim(); if(sw&&!validSwish(sw)){toast("Skriv ett svenskt mobilnummer, t.ex. 070-123 45 67");$("#a-swish").focus();return;}
     const city=$("#a-city").value, c=CITIES[city], prices={}; services.forEach(k=>prices[k]=+$("#a-p-"+k).value||0);
-    const s={id:"u"+uid(),name:$("#a-name").value.trim(),city,lat:c[0],lng:c[1],services,prices,sizes,home:$("#a-home").value.trim(),bio:$("#a-bio").value.trim(),exp:$("#a-exp").value.trim(),lang:$("#a-lang").value.trim(),photo:pendingPhoto,swish:sw?cleanSwish(sw):"",example:false};
-    S.sitters.unshift(s); if(!S.me.name) S.me.name=s.name; pendingPhoto=null; save(); toast("Annonsen är publicerad"); go("hundvakt-"+s.id);
+    const s={id:"u"+uid(),name:$("#a-name").value.trim(),city,lat:c[0],lng:c[1],services,prices,sizes,home:$("#a-home").value.trim(),bio:$("#a-bio").value.trim(),exp:$("#a-exp").value.trim(),lang:$("#a-lang").value.trim(),photo:pendingPhoto,stripeAccount:"",stripeReady:false,example:false};
+    S.sitters.unshift(s); if(!S.me.name) S.me.name=s.name; pendingPhoto=null; save(); toast("Annonsen är publicerad. Koppla Stripe för att ta emot betalningar."); go("hundvakt-"+s.id);
   };
 };
 
@@ -872,7 +914,7 @@ function profil(){
    ${offered.length?`<div class="reqlist">${offered.map(r=>reqCard(r,S.me.city)).join("")}</div>`:`<p class="muted small">Inga än. <a href="#kalender">Öppna kalendern</a> för att hitta uppdrag.</p>`}</div>
   <a class="card path" href="#annons"><span class="pic" style="background:var(--orange-soft);color:var(--orange-ink)">${I.paw}</span><div><h3>${S.sitters.length?"Dina hundvaktsannonser":"Bli hundvakt"}</h3><p class="muted small">${S.sitters.length?`${S.sitters.length} ${S.sitters.length===1?"annons":"annonser"}. Lägg till eller ta bort.`:"Skapa en annons och ta emot bokningar från hundägare."}</p></div><span class="go">${I.right}</span></a>
   <div class="card pad-lg stack" style="gap:10px"><h3>Din data</h3><p class="small muted">${S.bookings.length} bokningar, ${S.messages.length} meddelanden, ${S.requests.length} uppdrag, ${S.reviews.length} omdömen och ${S.sitters.length} annonser. Allt ligger bara i den här webbläsaren${storageOk?"":" (sparning fungerar inte just nu)"}.</p><button class="btn ghost sm" id="reset" style="align-self:flex-start">Radera all min data</button></div>
-  <div class="card pad-lg stack" style="gap:8px"><h3>Om prototypen</h3><p class="small muted">Sök, avstånd, uppdragskalender, bokningar, meddelanden, annonser, omdömen och Swish-flödet fungerar. Inloggning, BankID, identitetskontroll, Klarna och delning mellan användare finns inte än och kräver en riktig server.</p></div>
+  <div class="card pad-lg stack" style="gap:8px"><h3>Om prototypen</h3><p class="small muted">Sök, avstånd, uppdragskalender, bokningar, meddelanden, annonser och omdömen fungerar. Kortbetalning och utbetalningar via Stripe Connect fungerar när appen körs med Passas server. Inloggning, BankID, identitetskontroll och delning mellan användare finns inte än.</p></div>
   </div>`;
 }
 after.profil=()=>{
@@ -881,8 +923,10 @@ after.profil=()=>{
 };
 
 $("#logoMark").innerHTML=I.paw;
+checkPay();
 $("#ctaNew").innerHTML=I.plus+"<span>Lägg ut uppdrag</span>";
 render();
+handleReturn();
 })();
 </script>
 </body>
